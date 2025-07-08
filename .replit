@@ -1,6 +1,16 @@
 run = "cowsay Configure me!"
 entrypoint = "README.md"
+modules = ["nodejs-20", "python-3.11"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["cowsay"]
+packages = ["cowsay", "imagemagick_light"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "static"
+publicDir = "apple-product-site/build"
+build = ["sh", "-c", "npm run build --prefix apple-product-site"]
