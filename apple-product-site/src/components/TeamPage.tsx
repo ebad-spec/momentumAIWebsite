@@ -93,10 +93,10 @@ const TeamPage: React.FC = () => {
       {/* Auto-scrolling slider */}
       <div className="relative overflow-hidden py-8">
         {/* Left fade */}
-        <div className="absolute left-0 top-0 w-8 h-full bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute left-0 top-0 w-4 md:w-8 h-full bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
         
         {/* Right fade */}
-        <div className="absolute right-0 top-0 w-8 h-full bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 w-4 md:w-8 h-full bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
         
         <div className="flex animate-scroll-smooth">
           {duplicatedMembers.map((member, index) => (

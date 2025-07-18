@@ -11,25 +11,35 @@ function HomePage() {
     <>
       {/* Hero Section - ChatGPT style */}
       <section className="pt-32 pb-20 bg-white min-h-screen flex items-center relative">
+        {/* Backed by Brock LINC Badge */}
+        <div className="absolute top-44 sm:top-48 md:top-48 lg:top-44 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full">
+            <img 
+              src="/brock_linc_logo.jpeg" 
+              alt="Brock LINC Logo" 
+              className="w-4 h-4 mr-2 rounded-sm"
+            />
+            <span className="text-xs font-medium text-gray-700">Backed by Brock LINC</span>
+          </div>
+        </div>
+
         <div className="max-w-4xl mx-auto px-5 text-center">
-          <div className="mb-12">
-            <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              Study smarter.
-              <br />
-              <span className="text-red-500" style={{ color: '#ff0040' }}>Never fall behind.</span>
-            </h1>
-            <div className="max-w-2xl mx-auto mb-10">
-              <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed font-light">
-                Your AI-powered study assistant.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/beta">
-                <button className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg">
-                  Join our Beta →
-                </button>
-              </Link>
-            </div>
+          <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
+            Study smarter.
+            <br />
+            <span className="text-red-500" style={{ color: '#ff0040' }}>Never fall behind.</span>
+          </h1>
+          <div className="max-w-2xl mx-auto mb-10">
+            <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed font-light">
+              Your AI-powered study assistant.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link to="/beta">
+              <button className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg">
+                Join our Beta →
+              </button>
+            </Link>
           </div>
         </div>
         
@@ -237,11 +247,11 @@ function HomePage() {
                 className="w-full h-auto rounded-xl hover-lift border border-gray-200"
               />
               {/* Screenshot image positioned inside */}
-              <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8">
                 <img 
                   src="/mainapp.png" 
                   alt="App screenshot" 
-                  className="max-w-[95%] max-h-[95%] object-contain rounded-xl shadow-lg"
+                  className="max-w-[98%] max-h-[98%] sm:max-w-[96%] sm:max-h-[96%] md:max-w-[95%] md:max-h-[95%] object-contain rounded-xl shadow-lg"
                 />
               </div>
             </div>
@@ -267,11 +277,11 @@ function HomePage() {
                 className="w-full h-auto rounded-xl hover-lift border border-gray-200"
               />
               {/* Screenshot image positioned inside */}
-              <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8">
                 <img 
                   src="/Smarter plans.png" 
                   alt="Smarter plans screenshot" 
-                  className="max-w-[95%] max-h-[95%] object-contain rounded-xl shadow-lg"
+                  className="max-w-[98%] max-h-[98%] sm:max-w-[96%] sm:max-h-[96%] md:max-w-[95%] md:max-h-[95%] object-contain rounded-xl shadow-lg"
                 />
               </div>
             </div>
@@ -297,11 +307,11 @@ function HomePage() {
                 className="w-full h-auto rounded-xl hover-lift border border-gray-200"
               />
               {/* Screenshot image positioned inside */}
-              <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8">
                 <img 
                   src="/exam.png" 
                   alt="Exams and flashcards screenshot" 
-                  className="max-w-[95%] max-h-[95%] object-contain rounded-xl shadow-lg"
+                  className="max-w-[98%] max-h-[98%] sm:max-w-[96%] sm:max-h-[96%] md:max-w-[95%] md:max-h-[95%] object-contain rounded-xl shadow-lg"
                 />
               </div>
             </div>
@@ -327,11 +337,11 @@ function HomePage() {
                 className="w-full h-auto rounded-xl hover-lift border border-gray-200"
               />
               {/* Screenshot image positioned inside */}
-              <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-8">
                 <img 
                   src="/flashies.png" 
                   alt="Built for students screenshot" 
-                  className="max-w-[95%] max-h-[95%] object-contain rounded-xl shadow-lg"
+                  className="max-w-[98%] max-h-[98%] sm:max-w-[96%] sm:max-h-[96%] md:max-w-[95%] md:max-h-[95%] object-contain rounded-xl shadow-lg"
                 />
               </div>
             </div>
@@ -481,66 +491,203 @@ function HomePage() {
                 price: "$0",
                 period: "/ month",
                 description: "Unlimited chat & flashcards. 50 pages upload.",
-                features: [
-                  "Chat & flashcards",
-                  "50 pages upload",
-                  "Study plans",
-                  "Voice tutor (basic)"
-                ]
+                features: {
+                  "Agentic AI Chatbot": true,
+                  "AI Flashcards": true,
+                  "AI study plans (limited)": true,
+                  "Exam generator (limited)": true,
+                  "Voice tutor": true,
+                  "50 pages upload": true,
+                  "Gemini LLM access": true,
+                  "Basic analytics": true,
+                  "500+ pages upload": false,
+                  "3000+ pages upload": false,
+                  "Advanced LLMs": false,
+                  "MCAT & LSAT mode add-ons": false,
+                  "Limited lecture recording": false,
+                  "Unlimited lecture recording": false
+                }
               },
               {
                 name: "Standard",
-                price: "$6.99",
+                price: "$8.99",
+                oldPrice: "$15",
                 period: "/ month",
-                description: "All tools. 500 pages. Advanced planning.",
-                features: [
-                  "All Free features",
-                  "500 pages upload",
-                  "Exam generator",
-                  "Voice tutor (advanced)",
-                  "Calendar sync"
-                ],
+                description: "All tools. 500 pages. More LLMs.",
+                features: {
+                  "Agentic AI Chatbot": true,
+                  "AI Flashcards": true,
+                  "AI study plans": true,
+                  "Exam generator": true,
+                  "Voice tutor": true,
+                  "50 pages upload": true,
+                  "Gemini LLM access": true,
+                  "Basic analytics": true,
+                  "500+ pages upload": true,
+                  "Advanced LLMs": true,
+                  "MCAT & LSAT mode add-ons": true,
+                  "Limited lecture recording": true,
+                  "3000+ pages upload": false,
+                  "Unlimited lecture recording": false
+                },
                 popular: true
               },
               {
                 name: "Premium",
                 price: "$12",
+                oldPrice: "$20",
                 period: "/ month",
-                description: "MCAT/LSAT prep. 2,000 pages. Priority support.",
-                features: [
-                  "All Standard features",
-                  "MCAT/LSAT prep",
-                  "2,000 pages upload",
-                  "Priority support"
-                ]
+                description: "Maximum power. 3,000 pages. All LLMs.",
+                features: {
+                  "Agentic AI Chatbot": true,
+                  "AI Flashcards": true,
+                  "AI study plans": true,
+                  "Exam generator": true,
+                  "Voice tutor": true,
+                  "50 pages upload": true,
+                  "Gemini LLM access": true,
+                  "Basic analytics": true,
+                  "3000+ pages upload": true,
+                  "Advanced LLMs": true,
+                  "MCAT & LSAT mode add-ons": true,
+                  "Limited lecture recording": true,
+                  "Unlimited lecture recording": true
+                }
               }
             ].map((plan, index) => (
-              <div key={index} className={`border rounded-xl p-6 text-left ${plan.popular ? 'border-red-500 shadow-lg bg-gray-50' : 'border-gray-200 bg-white'}`}>
-                <div className="mb-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+              <div key={index} className={`border rounded-xl p-5 text-left h-full flex flex-col ${plan.popular ? 'border-red-500 shadow-lg bg-gray-50' : 'border-gray-200 bg-white'}`}>
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1.5">{plan.name}</h3>
                   <div className="flex items-baseline">
-                    <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-600 ml-1 text-sm">{plan.period}</span>
+                    <span className="text-2xl font-bold text-gray-900">{plan.price}</span>
+                    <span className="text-gray-600 ml-1 text-xs">{plan.period}</span>
+                    {plan.oldPrice && (
+                      <span className="text-gray-400 ml-1.5 text-xs line-through">{plan.oldPrice}</span>
+                    )}
                   </div>
-                  <p className="text-gray-600 mt-2 text-sm">{plan.description}</p>
+                  <p className="text-gray-600 mt-1.5 text-xs">{plan.description}</p>
                 </div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map((feature, featureIndex) => (
+                <ul className="space-y-1.5 mb-5 flex-grow">
+                  {Object.entries(plan.features).map(([feature, included], featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
-                      <span className="text-red-500 mr-2 mt-0.5">✓</span>
-                      <span className="text-gray-600 text-xs">{feature}</span>
+                      <span className={`mr-1.5 text-xs ${included ? 'text-red-500' : 'text-gray-400'}`}>
+                        {included ? '✓' : '✗'}
+                      </span>
+                      <span className={`text-xs ${included ? 'text-gray-600' : 'text-gray-400'}`}>{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <button className={`w-full py-2 px-5 rounded-full font-medium transition-colors text-sm ${
-                  plan.popular 
-                    ? 'bg-black text-white hover:bg-gray-800' 
-                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                }`}>
-                  Get started
-                </button>
+                <Link to="/beta">
+                  <button className={`w-full py-1.5 px-4 rounded-full font-medium transition-colors text-xs ${
+                    plan.popular 
+                      ? 'bg-black text-white hover:bg-gray-800' 
+                      : 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                  }`}>
+                    Sign up for beta
+                  </button>
+                </Link>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Add-ons Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-5 text-center">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+            Add-ons
+          </h2>
+          <p className="text-lg text-gray-600 mb-12">
+            Specialized modes for high-stakes exam preparation.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            {/* MCAT Mode Add-on */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-left hover:shadow-lg transition-all hover:bg-white hover:border-red-500">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center mr-4">
+                  <span className="text-2xl">🩺</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">MCAT Mode</h3>
+                  <p className="text-sm text-gray-600">Medical school prep</p>
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="flex items-baseline">
+                  <span className="text-2xl font-bold text-gray-900">+$10.99</span>
+                  <span className="text-gray-600 ml-1 text-sm">/ month</span>
+                </div>
+              </div>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Pre-loaded MCAT content</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Medical terminology focus</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Practice questions & simulations</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Score tracking & analytics</span>
+                </li>
+              </ul>
+              <button className="w-full py-2 px-5 rounded-full font-medium transition-colors text-sm border border-gray-300 text-gray-700 hover:bg-black hover:text-white hover:border-black">
+                Add to plan
+              </button>
+            </div>
+
+            {/* LSAT Mode Add-on */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-left hover:shadow-lg transition-all hover:bg-white hover:border-red-500">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center mr-4">
+                  <span className="text-2xl">⚖️</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">LSAT Mode</h3>
+                  <p className="text-sm text-gray-600">Law school prep</p>
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="flex items-baseline">
+                  <span className="text-2xl font-bold text-gray-900">+$10.99</span>
+                  <span className="text-gray-600 ml-1 text-sm">/ month</span>
+                </div>
+              </div>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Pre-loaded LSAT content</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Logic games & reasoning</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Reading comprehension focus</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-gray-900 mr-2">✓</span>
+                  <span className="text-gray-600 text-sm">Timed practice sections</span>
+                </li>
+              </ul>
+              <button className="w-full py-2 px-5 rounded-full font-medium transition-colors text-sm border border-gray-300 text-gray-700 hover:bg-black hover:text-white hover:border-black">
+                Add to plan
+              </button>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-500">
+              Add-ons can be combined with any plan. Requires Standard or Premium subscription.
+            </p>
           </div>
         </div>
       </section>
@@ -618,6 +765,8 @@ function Navigation() {
   const isTeamPage = location.pathname === '/team';
   const isDarkPage = location.pathname === '/team'; // Only team page uses dark styling
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileFeaturesOpen, setIsMobileFeaturesOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -632,16 +781,203 @@ function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu when clicking outside or on links
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isMobileMenuOpen && !target.closest('.mobile-menu') && !target.closest('.mobile-menu-button')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-colors duration-300 ${
-      isDarkPage 
-        ? (isScrolled ? 'bg-black/80 border-gray-800' : 'bg-black border-gray-800')
-        : 'bg-white/80 border-gray-100'
-    }`}>
-      <div className="max-w-5xl mx-auto px-5 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Link to="/">
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-colors duration-300 ${
+        isDarkPage 
+          ? (isScrolled ? 'bg-black/80 border-gray-800' : 'bg-black border-gray-800')
+          : 'bg-white/80 border-gray-100'
+      }`}>
+        <div className="max-w-5xl mx-auto px-5 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Link to="/">
+                <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={isDarkPage ? "/momentumDarkmode-removebg-preview.png" : "/medbotlogonew.jpg"} 
+                    alt="Momentum AI Logo" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+              </Link>
+              <span className={`text-base font-logo font-semibold tracking-tight ${
+                isDarkPage ? 'text-white' : 'text-gray-900'
+              }`}>Momentum AI</span>
+            </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
+              <div className="relative group">
+                <Link to="/" className={`transition-colors text-xs font-medium flex items-center ${
+                  isDarkPage 
+                    ? 'text-gray-300 hover:text-red-400' 
+                    : 'text-gray-600 hover:text-red-500'
+                }`}>
+                  Features
+                  <svg className="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Link>
+                <div className={`absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 ${
+                  isDarkPage 
+                    ? 'bg-black border-gray-700' 
+                    : 'bg-white border-gray-200'
+                }`}>
+                  <div className="py-2">
+                    <Link to="/#file-upload" className={`block px-4 py-2 text-xs transition-colors ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}>
+                      File Upload & Processing
+                    </Link>
+                    <Link to="/#voice-ai" className={`block px-4 py-2 text-xs transition-colors ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}>
+                      Voice AI Tutor
+                    </Link>
+                    <Link to="/#agentic-chatbot" className={`block px-4 py-2 text-xs transition-colors ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}>
+                      Agentic Chatbot
+                    </Link>
+                    <Link to="/#flashcards" className={`block px-4 py-2 text-xs transition-colors ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}>
+                      AI Flashcards & Spaced Repetition
+                    </Link>
+                    <Link to="/#exam-modes" className={`block px-4 py-2 text-xs transition-colors ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}>
+                      MCAT & LSAT Modes
+                    </Link>
+                  </div>
+                </div>
+              </div>
+              <Link to="/team" className={`transition-colors text-xs font-medium ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:text-red-400' 
+                  : 'text-gray-600 hover:text-red-500'
+              }`}>
+                Our Team
+              </Link>
+              <Link to="/#pricing" className={`transition-colors text-xs font-medium ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:text-red-400' 
+                  : 'text-gray-600 hover:text-red-500'
+              }`}>
+                Plans & Pricing
+              </Link>
+              <Link to="/careers" className={`transition-colors text-xs font-medium ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:text-red-400' 
+                  : 'text-gray-600 hover:text-red-500'
+              }`}>
+                Careers
+              </Link>
+            </div>
+            
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex items-center space-x-2">
+              <button className={`transition-colors text-xs font-medium ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:text-red-400' 
+                  : 'text-gray-600 hover:text-red-500'
+              }`}>
+                Log in
+              </button>
+              <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                isDarkPage 
+                  ? 'bg-white text-black hover:bg-gray-200' 
+                  : 'bg-black text-white hover:bg-gray-800'
+              }`}>
+                Sign up
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden mobile-menu-button p-2 rounded-lg transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              <div className="w-5 h-5 flex flex-col justify-center items-center relative">
+                <span className={`block w-5 h-0.5 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] absolute ${
+                  isDarkPage ? 'bg-white' : 'bg-gray-900'
+                } ${isMobileMenuOpen ? 'rotate-45' : '-translate-y-1'}`}></span>
+                <span className={`block w-5 h-0.5 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] absolute ${
+                  isDarkPage ? 'bg-white' : 'bg-gray-900'
+                } ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
+                <span className={`block w-5 h-0.5 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] absolute ${
+                  isDarkPage ? 'bg-white' : 'bg-gray-900'
+                } ${isMobileMenuOpen ? '-rotate-45' : 'translate-y-1'}`}></span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div 
+            className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={closeMobileMenu}
+          ></div>
+        </div>
+      )}
+
+      {/* Mobile Menu Panel */}
+      <div className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden mobile-menu ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className={`h-full backdrop-blur-xl border-r ${
+          isDarkPage 
+            ? 'bg-black/90 border-gray-800' 
+            : 'bg-white/90 border-gray-200'
+        }`}>
+          {/* Menu Header - Same height as nav bar */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200/20">
+            <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
                 <img 
                   src={isDarkPage ? "/momentumDarkmode-removebg-preview.png" : "/medbotlogonew.jpg"} 
@@ -649,108 +985,164 @@ function Navigation() {
                   className="w-full h-full object-cover" 
                 />
               </div>
-            </Link>
-            <span className={`text-base font-logo font-semibold tracking-tight ${
-              isDarkPage ? 'text-white' : 'text-gray-900'
-            }`}>Momentum AI</span>
+              <span className={`text-base font-logo font-semibold tracking-tight ${
+                isDarkPage ? 'text-white' : 'text-gray-900'
+              }`}>Momentum AI</span>
+            </div>
           </div>
-          <div className="hidden md:flex items-center space-x-6">
-            <div className="relative group">
-              <Link to="/" className={`transition-colors text-xs font-medium flex items-center ${
-                isDarkPage 
-                  ? 'text-gray-300 hover:text-red-400' 
-                  : 'text-gray-600 hover:text-red-500'
-              }`}>
-                Features
-                <svg className="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+          {/* Menu Items */}
+          <div className="p-5 space-y-1">
+            {/* Features Section */}
+            <div className="space-y-1">
+              <button
+                onClick={() => setIsMobileFeaturesOpen(!isMobileFeaturesOpen)}
+                className={`w-full flex items-center justify-between py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
+                  isDarkPage ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <span>Features</span>
+                <svg 
+                  className={`w-4 h-4 transition-transform ${isMobileFeaturesOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-              </Link>
-              <div className={`absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 ${
+              </button>
+               
+               <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                 isMobileFeaturesOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+               }`}>
+                 <div className="space-y-1">
+                   <Link 
+                     to="/#file-upload" 
+                     onClick={closeMobileMenu}
+                     className={`block py-3 px-6 text-sm transition-colors rounded-lg ${
+                       isDarkPage 
+                         ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                         : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                     }`}
+                   >
+                     File Upload & Processing
+                   </Link>
+                   <Link 
+                     to="/#voice-ai" 
+                     onClick={closeMobileMenu}
+                     className={`block py-3 px-6 text-sm transition-colors rounded-lg ${
+                       isDarkPage 
+                         ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                         : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                     }`}
+                   >
+                     Voice AI Tutor
+                   </Link>
+                   <Link 
+                     to="/#agentic-chatbot" 
+                     onClick={closeMobileMenu}
+                     className={`block py-3 px-6 text-sm transition-colors rounded-lg ${
+                       isDarkPage 
+                         ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                         : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                     }`}
+                   >
+                     Agentic Chatbot
+                   </Link>
+                   <Link 
+                     to="/#flashcards" 
+                     onClick={closeMobileMenu}
+                     className={`block py-3 px-6 text-sm transition-colors rounded-lg ${
+                       isDarkPage 
+                         ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                         : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                     }`}
+                   >
+                     AI Flashcards & Spaced Repetition
+                   </Link>
+                   <Link 
+                     to="/#exam-modes" 
+                     onClick={closeMobileMenu}
+                     className={`block py-3 px-6 text-sm transition-colors rounded-lg ${
+                       isDarkPage 
+                         ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                         : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                     }`}
+                   >
+                     MCAT & LSAT Modes
+                   </Link>
+                 </div>
+               </div>
+             </div>
+
+            {/* Divider */}
+            <div className="h-px bg-gray-200/20 my-4"></div>
+
+            {/* Main Navigation */}
+            <Link 
+              to="/team" 
+              onClick={closeMobileMenu}
+              className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
                 isDarkPage 
-                  ? 'bg-black border-gray-700' 
-                  : 'bg-white border-gray-200'
-              }`}>
-                <div className="py-2">
-                  <Link to="/#file-upload" className={`block px-4 py-2 text-xs transition-colors ${
-                    isDarkPage 
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                  }`}>
-                    File Upload & Processing
-                  </Link>
-                  <Link to="/#voice-ai" className={`block px-4 py-2 text-xs transition-colors ${
-                    isDarkPage 
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                  }`}>
-                    Voice AI Tutor
-                  </Link>
-                  <Link to="/#agentic-chatbot" className={`block px-4 py-2 text-xs transition-colors ${
-                    isDarkPage 
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                  }`}>
-                    Agentic Chatbot
-                  </Link>
-                  <Link to="/#flashcards" className={`block px-4 py-2 text-xs transition-colors ${
-                    isDarkPage 
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                  }`}>
-                    AI Flashcards & Spaced Repetition
-                  </Link>
-                  <Link to="/#exam-modes" className={`block px-4 py-2 text-xs transition-colors ${
-                    isDarkPage 
-                      ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                  }`}>
-                    MCAT & LSAT Modes
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <Link to="/team" className={`transition-colors text-xs font-medium ${
-              isDarkPage 
-                ? 'text-gray-300 hover:text-red-400' 
-                : 'text-gray-600 hover:text-red-500'
-            }`}>
+                  ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+              }`}
+            >
               Our Team
             </Link>
-            <Link to="/#pricing" className={`transition-colors text-xs font-medium ${
-              isDarkPage 
-                ? 'text-gray-300 hover:text-red-400' 
-                : 'text-gray-600 hover:text-red-500'
-            }`}>
+            <Link 
+              to="/#pricing" 
+              onClick={closeMobileMenu}
+              className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+              }`}
+            >
               Plans & Pricing
             </Link>
-            <Link to="/careers" className={`transition-colors text-xs font-medium ${
-              isDarkPage 
-                ? 'text-gray-300 hover:text-red-400' 
-                : 'text-gray-600 hover:text-red-500'
-            }`}>
+            <Link 
+              to="/careers" 
+              onClick={closeMobileMenu}
+              className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+              }`}
+            >
               Careers
             </Link>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button className={`transition-colors text-xs font-medium ${
-              isDarkPage 
-                ? 'text-gray-300 hover:text-red-400' 
-                : 'text-gray-600 hover:text-red-500'
-            }`}>
-              Log in
-            </button>
-            <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              isDarkPage 
-                ? 'bg-white text-black hover:bg-gray-200' 
-                : 'bg-black text-white hover:bg-gray-800'
-            }`}>
-              Sign up
-            </button>
+
+            {/* Divider */}
+            <div className="h-px bg-gray-200/20 my-4"></div>
+
+            {/* Auth Buttons */}
+            <div className="space-y-2 pt-2">
+              <button 
+                onClick={closeMobileMenu}
+                className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg text-left ${
+                  isDarkPage 
+                    ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                }`}
+              >
+                Log in
+              </button>
+              <button 
+                onClick={closeMobileMenu}
+                className={`w-full py-3 px-3 rounded-lg text-sm font-medium transition-colors ${
+                  isDarkPage 
+                    ? 'bg-white text-black hover:bg-gray-200' 
+                    : 'bg-black text-white hover:bg-gray-800'
+                }`}
+              >
+                Sign up
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 }
 
@@ -759,6 +1151,42 @@ function AppContent() {
   useSmoothScroll();
 
   const location = useLocation();
+
+  // Update theme color based on current page
+  useEffect(() => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    const appleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    
+    if (location.pathname === '/team') {
+      // Set to black for team page
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#000000');
+      }
+      // Add or update Apple-specific meta tag
+      if (appleStatusBar) {
+        appleStatusBar.setAttribute('content', 'black');
+      } else {
+        const newAppleStatusBar = document.createElement('meta');
+        newAppleStatusBar.name = 'apple-mobile-web-app-status-bar-style';
+        newAppleStatusBar.content = 'black';
+        document.head.appendChild(newAppleStatusBar);
+      }
+    } else {
+      // Set to white for all other pages
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#ffffff');
+      }
+      // Update Apple-specific meta tag
+      if (appleStatusBar) {
+        appleStatusBar.setAttribute('content', 'light-content');
+      } else {
+        const newAppleStatusBar = document.createElement('meta');
+        newAppleStatusBar.name = 'apple-mobile-web-app-status-bar-style';
+        newAppleStatusBar.content = 'light-content';
+        document.head.appendChild(newAppleStatusBar);
+      }
+    }
+  }, [location.pathname]);
 
   // Handle hash navigation when location changes
   useEffect(() => {
