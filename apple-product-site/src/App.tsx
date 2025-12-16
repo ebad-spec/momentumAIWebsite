@@ -3,8 +3,11 @@ import { Link, Route, BrowserRouter as Router, Routes, useLocation } from 'react
 import './App.css';
 import BetaSignup from './components/BetaSignup';
 import CareersPage from './components/CareersPage';
+import EventsPage from './components/EventsPage';
 import TeamPage from './components/TeamPage';
+import { PRELOAD_IMAGE_URLS } from './config/preloadManifest';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
+import { preloadImages } from './utils/preloadImages';
 
 function HomePage() {
   return (
@@ -35,11 +38,11 @@ function HomePage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/beta">
+            <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com">
               <button className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg">
-                Join our Beta →
+                Access our Beta →
               </button>
-            </Link>
+            </a>
           </div>
         </div>
         
@@ -484,36 +487,13 @@ function HomePage() {
           <p className="text-lg text-gray-600 mb-12">
             Simple, student-friendly pricing for every need.
           </p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
               {
-                name: "Free",
-                price: "$0",
-                period: "/ month",
-                description: "Unlimited chat & flashcards. 50 pages upload.",
-                features: {
-                  "Agentic AI Chatbot": true,
-                  "AI Flashcards": true,
-                  "AI study plans (limited)": true,
-                  "Exam generator (limited)": true,
-                  "Voice tutor": true,
-                  "50 pages upload": true,
-                  "Gemini LLM access": true,
-                  "Basic analytics": true,
-                  "500+ pages upload": false,
-                  "3000+ pages upload": false,
-                  "Advanced LLMs": false,
-                  "MCAT & LSAT mode add-ons": false,
-                  "Limited lecture recording": false,
-                  "Unlimited lecture recording": false
-                }
-              },
-              {
                 name: "Standard",
-                price: "$8.99",
-                oldPrice: "$15",
+                price: "$12.99",
                 period: "/ month",
-                description: "All tools. 500 pages. More LLMs.",
+                description: "All core tools. 500 pages. Advanced LLMs.",
                 features: {
                   "Agentic AI Chatbot": true,
                   "AI Flashcards": true,
@@ -534,10 +514,10 @@ function HomePage() {
               },
               {
                 name: "Premium",
-                price: "$12",
-                oldPrice: "$20",
+                price: "$29.99",
                 period: "/ month",
                 description: "Maximum power. 3,000 pages. All LLMs.",
+                trial: "Includes 7-day free trial",
                 features: {
                   "Agentic AI Chatbot": true,
                   "AI Flashcards": true,
@@ -561,11 +541,11 @@ function HomePage() {
                   <div className="flex items-baseline">
                     <span className="text-2xl font-bold text-gray-900">{plan.price}</span>
                     <span className="text-gray-600 ml-1 text-xs">{plan.period}</span>
-                    {plan.oldPrice && (
-                      <span className="text-gray-400 ml-1.5 text-xs line-through">{plan.oldPrice}</span>
-                    )}
                   </div>
                   <p className="text-gray-600 mt-1.5 text-xs">{plan.description}</p>
+                  {plan.trial && (
+                    <p className="text-gray-500 mt-1 text-xs font-medium">{plan.trial}</p>
+                  )}
                 </div>
                 <ul className="space-y-1.5 mb-5 flex-grow">
                   {Object.entries(plan.features).map(([feature, included], featureIndex) => (
@@ -577,15 +557,15 @@ function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/beta">
+                <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com">
                   <button className={`w-full py-1.5 px-4 rounded-full font-medium transition-colors text-xs ${
                     plan.popular 
                       ? 'bg-black text-white hover:bg-gray-800' 
                       : 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-red-500'
                   }`}>
-                    Sign up for beta
+                    Access our Beta
                   </button>
-                </Link>
+                </a>
               </div>
             ))}
           </div>
@@ -702,11 +682,11 @@ function HomePage() {
             Start for free and see the difference.
           </p>
           <div className="flex justify-center">
-            <Link to="/beta">
+            <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com">
               <button className="bg-black text-white px-8 py-3 rounded-full text-base font-medium hover:bg-gray-800 transition-all transform hover:scale-105">
-                Join our Beta →
+                Access our Beta →
               </button>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -821,11 +801,11 @@ function Navigation() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Link to="/">
-                <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
+                <div className="w-10 h-10 rounded-md flex items-center justify-center overflow-hidden">
                   <img 
-                    src={isDarkPage ? "/momentumDarkmode-removebg-preview.png" : "/medbotlogonew.jpg"} 
+                    src="/momentumaiLargeLogo-Photoroom.png" 
                     alt="Momentum AI Logo" 
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-contain" 
                   />
                 </div>
               </Link>
@@ -891,6 +871,13 @@ function Navigation() {
                   </div>
                 </div>
               </div>
+              <Link to="/events" className={`transition-colors text-xs font-medium ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:text-red-400' 
+                  : 'text-gray-600 hover:text-red-500'
+              }`}>
+                Events
+              </Link>
               <Link to="/team" className={`transition-colors text-xs font-medium ${
                 isDarkPage 
                   ? 'text-gray-300 hover:text-red-400' 
@@ -916,20 +903,20 @@ function Navigation() {
             
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center space-x-2">
-              <button className={`transition-colors text-xs font-medium ${
+              <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/login" className={`transition-colors text-xs font-medium ${
                 isDarkPage 
                   ? 'text-gray-300 hover:text-red-400' 
                   : 'text-gray-600 hover:text-red-500'
               }`}>
                 Log in
-              </button>
-              <button className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              </a>
+              <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/register" className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 isDarkPage 
                   ? 'bg-white text-black hover:bg-gray-200' 
                   : 'bg-black text-white hover:bg-gray-800'
               }`}>
                 Sign up
-              </button>
+              </a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -978,11 +965,11 @@ function Navigation() {
           {/* Menu Header - Same height as nav bar */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200/20">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-md flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-md flex items-center justify-center overflow-hidden">
                 <img 
-                  src={isDarkPage ? "/momentumDarkmode-removebg-preview.png" : "/medbotlogonew.jpg"} 
+                  src="/momentumaiLargeLogo-Photoroom.png" 
                   alt="Momentum AI Logo" 
-                  className="w-full h-full object-cover" 
+                  className="w-full h-full object-contain" 
                 />
               </div>
               <span className={`text-base font-logo font-semibold tracking-tight ${
@@ -1080,6 +1067,17 @@ function Navigation() {
 
             {/* Main Navigation */}
             <Link 
+              to="/events" 
+              onClick={closeMobileMenu}
+              className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+              }`}
+            >
+              Events
+            </Link>
+            <Link 
               to="/team" 
               onClick={closeMobileMenu}
               className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
@@ -1118,7 +1116,8 @@ function Navigation() {
 
             {/* Auth Buttons */}
             <div className="space-y-2 pt-2">
-              <button 
+              <a 
+                href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/login" 
                 onClick={closeMobileMenu}
                 className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg text-left ${
                   isDarkPage 
@@ -1127,8 +1126,9 @@ function Navigation() {
                 }`}
               >
                 Log in
-              </button>
-              <button 
+              </a>
+              <a 
+                href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/register" 
                 onClick={closeMobileMenu}
                 className={`w-full py-3 px-3 rounded-lg text-sm font-medium transition-colors ${
                   isDarkPage 
@@ -1137,7 +1137,7 @@ function Navigation() {
                 }`}
               >
                 Sign up
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -1151,6 +1151,56 @@ function AppContent() {
   useSmoothScroll();
 
   const location = useLocation();
+  const [areAssetsReady, setAssetsReady] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isIntroDone, setIntroDone] = useState(false);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    preloadImages(PRELOAD_IMAGE_URLS).finally(() => {
+      if (!isCancelled) {
+        setAssetsReady(true);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    let completionTimeout: NodeJS.Timeout | null = null;
+    let safetyTimeout: NodeJS.Timeout | null = null;
+
+    if (!areAssetsReady) {
+      interval = setInterval(() => {
+        setProgress((prev) => Math.min(prev + 1.5, 94));
+      }, 100);
+    } else {
+      completionTimeout = setTimeout(() => {
+        setProgress(100);
+      }, 800);
+    }
+
+    safetyTimeout = setTimeout(() => {
+      setProgress(100);
+    }, 4500);
+
+    return () => {
+      if (interval) clearInterval(interval);
+      if (completionTimeout) clearTimeout(completionTimeout);
+      if (safetyTimeout) clearTimeout(safetyTimeout);
+    };
+  }, [areAssetsReady]);
+
+  useEffect(() => {
+    if (progress >= 100) {
+      const timer = setTimeout(() => setIntroDone(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [progress]);
 
   // Update theme color based on current page
   useEffect(() => {
@@ -1201,11 +1251,31 @@ function AppContent() {
     }
   }, [location]);
 
+  const isLoadingVisible = !isIntroDone;
+
   return (
-    <div className="App bg-white min-h-screen">
+    <div className="App bg-white min-h-screen relative overflow-hidden">
+      <div
+        className={`fixed inset-0 z-[60] flex flex-col items-center justify-center bg-white transition-opacity duration-700 ease-out ${isLoadingVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      >
+        <img
+          src="/momentumaiLargeLogo-Photoroom.png"
+          alt="Momentum AI logo"
+          className="w-24 h-24 object-contain mb-10 drop-shadow-xl transition-transform duration-500"
+          style={{ transform: isLoadingVisible ? 'translateY(0)' : 'translateY(-10px)' }}
+        />
+        <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-black transition-all duration-500 ease-out"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+
       <Navigation />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/beta" element={<BetaSignup />} />
         <Route path="/careers" element={<CareersPage />} />
