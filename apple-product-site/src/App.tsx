@@ -4,6 +4,8 @@ import './App.css';
 import BetaSignup from './components/BetaSignup';
 import CareersPage from './components/CareersPage';
 import EventsPage from './components/EventsPage';
+import Login from './components/Login';
+import Signup from './components/Signup';
 import TeamPage from './components/TeamPage';
 import { PRELOAD_IMAGE_URLS } from './config/preloadManifest';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
@@ -903,20 +905,20 @@ function Navigation() {
             
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center space-x-2">
-              <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/login" className={`transition-colors text-xs font-medium ${
+              <Link to="/login" className={`transition-colors text-xs font-medium ${
                 isDarkPage 
                   ? 'text-gray-300 hover:text-red-400' 
                   : 'text-gray-600 hover:text-red-500'
               }`}>
                 Log in
-              </a>
-              <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/register" className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              </Link>
+              <Link to="/signup" className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 isDarkPage 
                   ? 'bg-white text-black hover:bg-gray-200' 
                   : 'bg-black text-white hover:bg-gray-800'
               }`}>
                 Sign up
-              </a>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -1116,8 +1118,8 @@ function Navigation() {
 
             {/* Auth Buttons */}
             <div className="space-y-2 pt-2">
-              <a 
-                href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/login" 
+              <Link 
+                to="/login" 
                 onClick={closeMobileMenu}
                 className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg text-left ${
                   isDarkPage 
@@ -1126,18 +1128,18 @@ function Navigation() {
                 }`}
               >
                 Log in
-              </a>
-              <a 
-                href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com/register" 
+              </Link>
+              <Link 
+                to="/signup" 
                 onClick={closeMobileMenu}
-                className={`w-full py-3 px-3 rounded-lg text-sm font-medium transition-colors ${
+                className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
                   isDarkPage 
                     ? 'bg-white text-black hover:bg-gray-200' 
                     : 'bg-black text-white hover:bg-gray-800'
                 }`}
               >
                 Sign up
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -1279,6 +1281,8 @@ function AppContent() {
         <Route path="/team" element={<TeamPage />} />
         <Route path="/beta" element={<BetaSignup />} />
         <Route path="/careers" element={<CareersPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </div>
   );

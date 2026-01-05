@@ -129,11 +129,11 @@ const BetaSignup: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-16">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center overflow-hidden">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center overflow-hidden bg-white">
             <img 
-              src="/medbotlogonew.jpg" 
+              src="/momentumaiLargeLogo-Photoroom.png" 
               alt="Momentum AI Logo" 
-              className="w-full h-full object-cover" 
+              className="w-full h-full object-contain" 
             />
           </div>
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">
