@@ -21,6 +21,7 @@ build = ["sh", "-c", "npm run build --prefix apple-product-site"]
 
 [agent]
 expertMode = true
+integrations = ["resend:1.0.0"]
 
 [workflows]
 runButton = "Project"
