@@ -156,6 +156,50 @@ export function setupStripe(app: Express) {
     res.json({ received: true });
   });
 
+  // Verify checkout session and update subscription (for local dev when webhooks don't work)
+  app.post('/api/verify-checkout-session', async (req: Request, res: Response) => {
+    try {
+      const { session_id } = req.body;
+      
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      if (!session_id) {
+        return res.status(400).json({ error: 'Session ID required' });
+      }
+
+      // Retrieve the session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(session_id);
+      
+      if (!session || session.payment_status !== 'paid') {
+        return res.status(400).json({ error: 'Invalid or unpaid session' });
+      }
+
+      const userId = session.metadata?.userId;
+      const plan = session.metadata?.plan;
+      
+      if (userId && parseInt(userId) === req.user.id && plan) {
+        // Update the user's subscription
+        await updateUserSubscription(req.user.id, {
+          subscriptionPlan: plan,
+          subscriptionStatus: 'trialing', // It's in trial period
+          stripeCustomerId: session.customer as string,
+          stripeSubscriptionId: session.subscription as string,
+        });
+        
+        console.log(`Verified and updated subscription for user ${req.user.id}: plan=${plan}`);
+        
+        res.json({ success: true, plan, status: 'trialing' });
+      } else {
+        res.status(400).json({ error: 'Session does not match user' });
+      }
+    } catch (error) {
+      console.error('Error verifying checkout session:', error);
+      res.status(500).json({ error: 'Failed to verify session' });
+    }
+  });
+
   // Get subscription status
   app.get('/api/subscription-status', async (req: Request, res: Response) => {
     try {

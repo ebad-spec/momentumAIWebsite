@@ -11,6 +11,27 @@ const PaymentSuccess: React.FC = () => {
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 100);
     
+    // Verify and activate subscription
+    if (sessionId) {
+      fetch('/api/verify-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ session_id: sessionId }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log('Subscription activated:', data);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to verify session:', err);
+        });
+    }
+    
     // Force animation to play on mount using Web Animations API
     if (circleRef.current && checkRef.current) {
       // Reset and animate circle
@@ -39,7 +60,7 @@ const PaymentSuccess: React.FC = () => {
         }
       }, 600);
     }
-  }, []);
+  }, [sessionId]);
 
   return (
     <div className={`min-h-screen bg-white flex flex-col transition-opacity duration-700 ${
