@@ -57,6 +57,12 @@ async function initializeDatabase() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='stripe_subscription_id') THEN
           ALTER TABLE users ADD COLUMN stripe_subscription_id VARCHAR(255);
         END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='trial_end_date') THEN
+          ALTER TABLE users ADD COLUMN trial_end_date TIMESTAMP;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='subscription_end_date') THEN
+          ALTER TABLE users ADD COLUMN subscription_end_date TIMESTAMP;
+        END IF;
       END $$;
     `);
     

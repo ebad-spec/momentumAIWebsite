@@ -54,6 +54,8 @@ export async function updateUserSubscription(
     subscriptionStatus?: string | null;
     stripeCustomerId?: string | null;
     stripeSubscriptionId?: string | null;
+    trialEndDate?: Date | null;
+    subscriptionEndDate?: Date | null;
   }
 ): Promise<User | undefined> {
   const result = await db.update(users)

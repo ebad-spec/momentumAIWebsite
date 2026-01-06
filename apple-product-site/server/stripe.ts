@@ -92,15 +92,22 @@ export function setupStripe(app: Express) {
         const userId = session.metadata?.userId;
         const plan = session.metadata?.plan;
         
-        if (userId && plan) {
+        if (userId && plan && session.subscription) {
           try {
+            // Get subscription to find trial end date
+            const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+            const trialEndDate = subscription.trial_end 
+              ? new Date(subscription.trial_end * 1000) 
+              : null;
+            
             await updateUserSubscription(parseInt(userId), {
               subscriptionPlan: plan,
-              subscriptionStatus: 'active',
+              subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : 'active',
               stripeCustomerId: session.customer as string,
               stripeSubscriptionId: session.subscription as string,
+              trialEndDate: trialEndDate,
             });
-            console.log(`Updated subscription for user ${userId}: plan=${plan}`);
+            console.log(`Updated subscription for user ${userId}: plan=${plan}, trial ends ${trialEndDate}`);
           } catch (err) {
             console.error('Failed to update user subscription:', err);
           }
@@ -180,15 +187,24 @@ export function setupStripe(app: Express) {
       const plan = session.metadata?.plan;
       
       if (userId && parseInt(userId) === req.user.id && plan) {
+        // Get the subscription to find trial end date
+        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+        
+        // Calculate trial end date (7 days from now)
+        const trialEndDate = subscription.trial_end 
+          ? new Date(subscription.trial_end * 1000) 
+          : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        
         // Update the user's subscription
         await updateUserSubscription(req.user.id, {
           subscriptionPlan: plan,
           subscriptionStatus: 'trialing', // It's in trial period
           stripeCustomerId: session.customer as string,
           stripeSubscriptionId: session.subscription as string,
+          trialEndDate: trialEndDate,
         });
         
-        console.log(`Verified and updated subscription for user ${req.user.id}: plan=${plan}`);
+        console.log(`Verified and updated subscription for user ${req.user.id}: plan=${plan}, trial ends ${trialEndDate}`);
         
         res.json({ success: true, plan, status: 'trialing' });
       } else {
@@ -213,16 +229,121 @@ export function setupStripe(app: Express) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      const hasActiveSubscription = user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing';
+      // Check if user has active access
+      const now = new Date();
+      let hasActiveAccess = false;
+      let daysRemaining = 0;
+      
+      // Check if in trial period
+      if (user.trialEndDate && new Date(user.trialEndDate) > now) {
+        hasActiveAccess = true;
+        daysRemaining = Math.ceil((new Date(user.trialEndDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      } 
+      // Check if subscription is active
+      else if (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing') {
+        hasActiveAccess = true;
+      }
+      // Check if cancelled but still in billing period
+      else if (user.subscriptionStatus === 'cancelled' && user.subscriptionEndDate && new Date(user.subscriptionEndDate) > now) {
+        hasActiveAccess = true;
+        daysRemaining = Math.ceil((new Date(user.subscriptionEndDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      }
       
       res.json({ 
-        hasSubscription: hasActiveSubscription,
+        hasSubscription: hasActiveAccess,
         plan: user.subscriptionPlan || null,
-        status: user.subscriptionStatus || null
+        status: user.subscriptionStatus || null,
+        trialEndDate: user.trialEndDate || null,
+        subscriptionEndDate: user.subscriptionEndDate || null,
+        daysRemaining: daysRemaining > 0 ? daysRemaining : null
       });
     } catch (error) {
       console.error('Error fetching subscription:', error);
       res.status(500).json({ error: 'Failed to fetch subscription' });
+    }
+  });
+
+  // Change subscription plan
+  app.post('/api/change-subscription', async (req: Request, res: Response) => {
+    try {
+      const { newPlan } = req.body;
+      
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      if (!newPlan || (newPlan !== 'standard' && newPlan !== 'premium')) {
+        return res.status(400).json({ error: 'Invalid plan' });
+      }
+
+      const user = await getUserById(req.user.id);
+      
+      if (!user || !user.stripeSubscriptionId) {
+        return res.status(404).json({ error: 'No active subscription found' });
+      }
+
+      // Get the new price ID
+      const priceIds: { [key: string]: string } = {
+        standard: process.env.STRIPE_STANDARD_PRICE_ID || '',
+        premium: process.env.STRIPE_PREMIUM_PRICE_ID || '',
+      };
+
+      // Update the subscription in Stripe
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        items: [{
+          id: subscription.items.data[0].id,
+          price: priceIds[newPlan],
+        }],
+        proration_behavior: 'always_invoice', // Prorate the charges
+      });
+
+      // Update in database
+      await updateUserSubscription(req.user.id, {
+        subscriptionPlan: newPlan,
+      });
+
+      console.log(`Changed subscription for user ${req.user.id} to ${newPlan}`);
+      res.json({ success: true, newPlan });
+    } catch (error) {
+      console.error('Error changing subscription:', error);
+      res.status(500).json({ error: 'Failed to change subscription' });
+    }
+  });
+
+  // Cancel subscription
+  app.post('/api/cancel-subscription', async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const user = await getUserById(req.user.id);
+      
+      if (!user || !user.stripeSubscriptionId) {
+        return res.status(404).json({ error: 'No active subscription found' });
+      }
+
+      // Get subscription to find when current period ends
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const periodEnd = new Date(subscription.current_period_end * 1000);
+
+      // Cancel the subscription at period end (so user keeps access until then)
+      await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
+
+      // Update status in database with end date
+      await updateUserSubscription(req.user.id, {
+        subscriptionStatus: 'cancelled',
+        subscriptionEndDate: periodEnd,
+      });
+
+      console.log(`Cancelled subscription for user ${req.user.id}, access until ${periodEnd}`);
+      res.json({ success: true, accessUntil: periodEnd });
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      res.status(500).json({ error: 'Failed to cancel subscription' });
     }
   });
 }
