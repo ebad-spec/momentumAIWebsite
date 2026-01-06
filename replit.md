@@ -33,8 +33,14 @@ Preferred communication style: Simple, everyday language.
 ### Data Storage
 - **Database**: PostgreSQL
 - **ORM**: Drizzle ORM with node-postgres driver
-- **Schema**: Single `users` table with fields for email, password, name, verification tokens, and reset tokens
+- **Schema**: Single `users` table with fields for email, password, name, verification tokens, reset tokens, and subscription data (plan, status, Stripe customer ID, Stripe subscription ID)
 - **Session Storage**: PostgreSQL-backed session store
+
+### Subscription System
+- **Payment Provider**: Stripe for subscription payments with 7-day free trial
+- **Plans**: Standard and Premium tiers
+- **Webhook Events**: Handles checkout.session.completed, customer.subscription.updated, and customer.subscription.deleted
+- **Access Control**: Logged-in users with active subscriptions are redirected directly to the platform; non-subscribers see the paywall modal
 
 ### Email Services
 - **Primary**: Resend API for transactional emails (verification, welcome, password reset)
@@ -53,6 +59,7 @@ Preferred communication style: Simple, everyday language.
 - **Resend**: Email delivery for authentication flows (verification, password reset, welcome emails)
 - **EmailJS**: Client-side email service for beta signup notifications
 - **PostgreSQL**: Primary database (requires DATABASE_URL environment variable)
+- **Stripe**: Payment processing for subscriptions (requires STRIPE_SECRET_KEY, STRIPE_STANDARD_PRICE_ID, STRIPE_PREMIUM_PRICE_ID, STRIPE_WEBHOOK_SECRET)
 
 ### Key Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string
