@@ -44,7 +44,8 @@ const Login: React.FC = () => {
         throw new Error(data.error || 'Login failed');
       }
 
-      navigate('/');
+      // Refresh the page to update navigation
+      window.location.href = '/';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

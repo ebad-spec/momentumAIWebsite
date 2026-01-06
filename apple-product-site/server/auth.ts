@@ -5,7 +5,7 @@ import session from "express-session";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { sessionStore, getUserById, getUserByEmail, createUser, updateUser, getUserByVerificationToken, getUserByResetToken } from "./storage";
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "./email";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendVerificationCodeEmail, generateVerificationCode } from "./email";
 import { User } from "./schema";
 
 declare global {
@@ -74,56 +74,10 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req: Request, res: Response) => {
-    try {
-      const { email, password, name } = req.body;
-      
-      if (!email || !password || !name) {
-        return res.status(400).json({ error: "Email, password, and name are required" });
-      }
-
-      if (password.length < 8) {
-        return res.status(400).json({ error: "Password must be at least 8 characters" });
-      }
-
-      const existingUser = await getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const verificationToken = crypto.randomBytes(32).toString("hex");
-
-      const user = await createUser({
-        email,
-        password: hashedPassword,
-        name,
-        verificationToken,
-        emailVerified: false,
-      });
-
-      try {
-        await sendVerificationEmail(email, verificationToken, name);
-      } catch (emailError) {
-        console.error("Failed to send verification email:", emailError);
-      }
-
-      const { password: _, ...userWithoutPassword } = user;
-
-      req.login(userWithoutPassword as Express.User, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Failed to log in after registration" });
-        }
-        res.status(201).json({ 
-          user: userWithoutPassword,
-          message: "Account created! Please check your email to verify your account."
-        });
-      });
-    } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ error: "Failed to create account" });
-    }
-  });
+  // OLD ENDPOINT - DISABLED (now using 2-step verification)
+  // app.post("/api/register", async (req: Request, res: Response) => {
+  //   ... commented out to use new 2-step verification flow
+  // });
 
   app.post("/api/login", (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
@@ -156,6 +110,127 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ error: "Not authenticated" });
     }
     res.json({ user: req.user });
+  });
+
+  // Temporary storage for verification codes (in production, use Redis or database)
+  const verificationCodes = new Map<string, { code: string; email: string; name: string; password: string; expiresAt: number }>();
+
+  // Step 1: Send verification code
+  app.post("/api/send-verification-code", async (req: Request, res: Response) => {
+    try {
+      const { email, password, name } = req.body;
+      
+      if (!email || !password || !name) {
+        return res.status(400).json({ error: "Email, password, and name are required" });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ error: "Password must be at least 8 characters" });
+      }
+
+      const existingUser = await getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      const code = generateVerificationCode();
+      const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+      // Store verification code
+      verificationCodes.set(email, {
+        code,
+        email,
+        name,
+        password,
+        expiresAt
+      });
+
+      // Clean up expired codes
+      for (const [key, value] of verificationCodes.entries()) {
+        if (value.expiresAt < Date.now()) {
+          verificationCodes.delete(key);
+        }
+      }
+
+      try {
+        await sendVerificationCodeEmail(email, code, name);
+      } catch (emailError) {
+        console.error("Failed to send verification code:", emailError);
+        return res.status(500).json({ error: "Failed to send verification code" });
+      }
+
+      res.status(200).json({ 
+        message: "Verification code sent to your email",
+        email 
+      });
+    } catch (error) {
+      console.error("Send verification code error:", error);
+      res.status(500).json({ error: "Failed to send verification code" });
+    }
+  });
+
+  // Step 2: Verify code and create account
+  app.post("/api/verify-code-and-register", async (req: Request, res: Response) => {
+    try {
+      const { email, code } = req.body;
+      
+      if (!email || !code) {
+        return res.status(400).json({ error: "Email and code are required" });
+      }
+
+      const storedData = verificationCodes.get(email);
+      
+      if (!storedData) {
+        return res.status(400).json({ error: "Verification code not found or expired" });
+      }
+
+      if (storedData.expiresAt < Date.now()) {
+        verificationCodes.delete(email);
+        return res.status(400).json({ error: "Verification code has expired" });
+      }
+
+      if (storedData.code !== code) {
+        return res.status(400).json({ error: "Invalid verification code" });
+      }
+
+      // Code is valid, create the user
+      const hashedPassword = await bcrypt.hash(storedData.password, 10);
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+
+      const user = await createUser({
+        email: storedData.email,
+        password: hashedPassword,
+        name: storedData.name,
+        verificationToken,
+        emailVerified: true, // Email is verified since they entered the code
+      });
+
+      // Clean up the verification code
+      verificationCodes.delete(email);
+
+      // Send welcome email
+      try {
+        await sendWelcomeEmail(user.email, user.name);
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+        // Don't fail the registration if email fails
+      }
+
+      const { password: _, ...userWithoutPassword } = user;
+
+      req.login(userWithoutPassword as Express.User, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Failed to log in after registration" });
+        }
+        res.status(201).json({ 
+          user: userWithoutPassword,
+          message: "Account created successfully!"
+        });
+      });
+    } catch (error) {
+      console.error("Verify code error:", error);
+      res.status(500).json({ error: "Failed to verify code" });
+    }
   });
 
   app.get("/api/verify-email", async (req: Request, res: Response) => {

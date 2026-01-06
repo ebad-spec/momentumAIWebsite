@@ -7,13 +7,29 @@ import EventsPage from './components/EventsPage';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import TeamPage from './components/TeamPage';
+import PaywallModal from './components/PaywallModal';
+import PaymentSuccess from './components/PaymentSuccess';
 import { PRELOAD_IMAGE_URLS } from './config/preloadManifest';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
 import { preloadImages } from './utils/preloadImages';
+import { useAuth } from './hooks/useAuth';
 
 function HomePage() {
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+
+  const handleContinue = (selectedPlan: 'standard' | 'premium', addons: string[]) => {
+    console.log('Selected plan:', selectedPlan, 'Addons:', addons);
+    // TODO: Integrate with payment processing
+    setIsPaywallOpen(false);
+  };
+
   return (
     <>
+      <PaywallModal 
+        isOpen={isPaywallOpen} 
+        onClose={() => setIsPaywallOpen(false)}
+        onContinue={handleContinue}
+      />
       {/* Hero Section - ChatGPT style */}
       <section className="pt-32 pb-20 bg-white min-h-screen flex items-center relative">
         {/* Backed by Brock LINC Badge */}
@@ -40,11 +56,12 @@ function HomePage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com">
-              <button className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg">
-                Access our Beta →
-              </button>
-            </a>
+            <button 
+              onClick={() => setIsPaywallOpen(true)}
+              className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg"
+            >
+              Access our Beta →
+            </button>
           </div>
         </div>
         
@@ -496,6 +513,7 @@ function HomePage() {
                 price: "$12.99",
                 period: "/ month",
                 description: "All core tools. 500 pages. Advanced LLMs.",
+                trial: "Includes 7-day free trial",
                 features: {
                   "Agentic AI Chatbot": true,
                   "AI Flashcards": true,
@@ -559,15 +577,16 @@ function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com">
-                  <button className={`w-full py-1.5 px-4 rounded-full font-medium transition-colors text-xs ${
+                <button 
+                  onClick={() => setIsPaywallOpen(true)}
+                  className={`w-full py-1.5 px-4 rounded-full font-medium transition-colors text-xs ${
                     plan.popular 
                       ? 'bg-black text-white hover:bg-gray-800' 
                       : 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                  }`}>
-                    Access our Beta
-                  </button>
-                </a>
+                  }`}
+                >
+                  Access our Beta
+                </button>
               </div>
             ))}
           </div>
@@ -684,11 +703,12 @@ function HomePage() {
             Start for free and see the difference.
           </p>
           <div className="flex justify-center">
-            <a href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com">
-              <button className="bg-black text-white px-8 py-3 rounded-full text-base font-medium hover:bg-gray-800 transition-all transform hover:scale-105">
-                Access our Beta →
-              </button>
-            </a>
+            <button 
+              onClick={() => setIsPaywallOpen(true)}
+              className="bg-black text-white px-8 py-3 rounded-full text-base font-medium hover:bg-gray-800 transition-all transform hover:scale-105"
+            >
+              Access our Beta →
+            </button>
           </div>
         </div>
       </section>
@@ -749,6 +769,7 @@ function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileFeaturesOpen, setIsMobileFeaturesOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -799,7 +820,7 @@ function Navigation() {
           ? (isScrolled ? 'bg-black/80 border-gray-800' : 'bg-black border-gray-800')
           : 'bg-white/80 border-gray-100'
       }`}>
-        <div className="max-w-5xl mx-auto px-5 py-3">
+        <div className="max-w-5xl mx-auto px-5 py-3 relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Link to="/">
@@ -816,8 +837,8 @@ function Navigation() {
               }`}>Momentum AI</span>
             </div>
             
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-6">
+            {/* Desktop Navigation - Centered */}
+            <div className="hidden md:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2">
               <div className="relative group">
                 <Link to="/" className={`transition-colors text-xs font-medium flex items-center ${
                   isDarkPage 
@@ -905,20 +926,55 @@ function Navigation() {
             
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center space-x-2">
-              <Link to="/login" className={`transition-colors text-xs font-medium ${
-                isDarkPage 
-                  ? 'text-gray-300 hover:text-red-400' 
-                  : 'text-gray-600 hover:text-red-500'
-              }`}>
-                Log in
-              </Link>
-              <Link to="/signup" className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                isDarkPage 
-                  ? 'bg-white text-black hover:bg-gray-200' 
-                  : 'bg-black text-white hover:bg-gray-800'
-              }`}>
-                Sign up
-              </Link>
+              {user ? (
+                <div className="relative group">
+                  <button className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-semibold hover:bg-gray-800 transition-colors">
+                    {user.name.charAt(0).toUpperCase()}
+                  </button>
+                  <div className={`absolute right-0 top-full mt-2 w-48 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 ${
+                    isDarkPage 
+                      ? 'bg-black border-gray-700' 
+                      : 'bg-white border-gray-200'
+                  }`}>
+                    <div className="py-2">
+                      <div className={`px-4 py-2 text-xs ${
+                        isDarkPage ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        <div className="font-semibold">{user.name}</div>
+                        <div className="text-gray-500 text-[10px] mt-0.5">{user.email}</div>
+                      </div>
+                      <div className="border-t my-1" style={{ borderColor: isDarkPage ? '#374151' : '#e5e7eb' }}></div>
+                      <button
+                        onClick={logout}
+                        className={`w-full text-left px-4 py-2 text-xs transition-colors ${
+                          isDarkPage 
+                            ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                        }`}
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" className={`transition-colors text-xs font-medium ${
+                    isDarkPage 
+                      ? 'text-gray-300 hover:text-red-400' 
+                      : 'text-gray-600 hover:text-red-500'
+                  }`}>
+                    Log in
+                  </Link>
+                  <Link to="/signup" className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    isDarkPage 
+                      ? 'bg-white text-black hover:bg-gray-200' 
+                      : 'bg-black text-white hover:bg-gray-800'
+                  }`}>
+                    Sign up
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -1118,28 +1174,54 @@ function Navigation() {
 
             {/* Auth Buttons */}
             <div className="space-y-2 pt-2">
-              <Link 
-                to="/login" 
-                onClick={closeMobileMenu}
-                className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg text-left ${
-                  isDarkPage 
-                    ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
-                }`}
-              >
-                Log in
-              </Link>
-              <Link 
-                to="/signup" 
-                onClick={closeMobileMenu}
-                className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
-                  isDarkPage 
-                    ? 'bg-white text-black hover:bg-gray-200' 
-                    : 'bg-black text-white hover:bg-gray-800'
-                }`}
-              >
-                Sign up
-              </Link>
+              {user ? (
+                <>
+                  <div className={`px-3 py-3 text-sm ${
+                    isDarkPage ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    <div className="font-semibold">{user.name}</div>
+                    <div className="text-gray-500 text-xs mt-0.5">{user.email}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      closeMobileMenu();
+                    }}
+                    className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg text-left ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    onClick={closeMobileMenu}
+                    className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg text-left ${
+                      isDarkPage 
+                        ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+                    }`}
+                  >
+                    Log in
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    onClick={closeMobileMenu}
+                    className={`block w-full py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
+                      isDarkPage 
+                        ? 'bg-white text-black hover:bg-gray-200' 
+                        : 'bg-black text-white hover:bg-gray-800'
+                    }`}
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1283,6 +1365,7 @@ function AppContent() {
         <Route path="/careers" element={<CareersPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/success" element={<PaymentSuccess />} />
       </Routes>
     </div>
   );

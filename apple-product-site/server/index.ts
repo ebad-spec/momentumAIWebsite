@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { setupAuth } from "./auth";
+import { setupStripe } from "./stripe";
 import { pool } from "./db";
 import { users } from "./schema";
 import { sql } from "drizzle-orm";
@@ -14,6 +15,10 @@ app.use(cors({
   origin: true,
   credentials: true,
 }));
+
+// Stripe webhook needs raw body
+app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), (req, res, next) => next());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,6 +44,7 @@ async function initializeDatabase() {
 }
 
 setupAuth(app);
+setupStripe(app);
 
 app.use(express.static(path.join(__dirname, "../build")));
 
