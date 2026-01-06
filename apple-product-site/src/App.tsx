@@ -14,13 +14,50 @@ import { useSmoothScroll } from './hooks/useSmoothScroll';
 import { preloadImages } from './utils/preloadImages';
 import { useAuth } from './hooks/useAuth';
 
+const PLATFORM_URL = "http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com";
+
 function HomePage() {
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
 
   const handleContinue = (selectedPlan: 'standard' | 'premium', addons: string[]) => {
     console.log('Selected plan:', selectedPlan, 'Addons:', addons);
-    // TODO: Integrate with payment processing
     setIsPaywallOpen(false);
+  };
+
+  const handleAccessBeta = async () => {
+    setIsCheckingSubscription(true);
+    
+    try {
+      const authResponse = await fetch('/api/user', {
+        credentials: 'include',
+      });
+      
+      if (!authResponse.ok) {
+        setIsPaywallOpen(true);
+        return;
+      }
+      
+      const subscriptionResponse = await fetch('/api/subscription-status', {
+        credentials: 'include',
+      });
+      
+      if (subscriptionResponse.ok) {
+        const data = await subscriptionResponse.json();
+        
+        if (data.hasSubscription) {
+          window.location.href = PLATFORM_URL;
+          return;
+        }
+      }
+      
+      setIsPaywallOpen(true);
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      setIsPaywallOpen(true);
+    } finally {
+      setIsCheckingSubscription(false);
+    }
   };
 
   return (
@@ -57,10 +94,11 @@ function HomePage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
-              onClick={() => setIsPaywallOpen(true)}
-              className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg"
+              onClick={handleAccessBeta}
+              disabled={isCheckingSubscription}
+              className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all transform hover:scale-105 shadow-lg disabled:opacity-70 disabled:cursor-wait"
             >
-              Access our Beta →
+              {isCheckingSubscription ? 'Loading...' : 'Access our Beta →'}
             </button>
           </div>
         </div>
@@ -578,14 +616,15 @@ function HomePage() {
                   ))}
                 </ul>
                 <button 
-                  onClick={() => setIsPaywallOpen(true)}
-                  className={`w-full py-1.5 px-4 rounded-full font-medium transition-colors text-xs ${
+                  onClick={handleAccessBeta}
+                  disabled={isCheckingSubscription}
+                  className={`w-full py-1.5 px-4 rounded-full font-medium transition-colors text-xs disabled:opacity-70 disabled:cursor-wait ${
                     plan.popular 
                       ? 'bg-black text-white hover:bg-gray-800' 
                       : 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-red-500'
                   }`}
                 >
-                  Access our Beta
+                  {isCheckingSubscription ? 'Loading...' : 'Access our Beta'}
                 </button>
               </div>
             ))}
@@ -704,10 +743,11 @@ function HomePage() {
           </p>
           <div className="flex justify-center">
             <button 
-              onClick={() => setIsPaywallOpen(true)}
-              className="bg-black text-white px-8 py-3 rounded-full text-base font-medium hover:bg-gray-800 transition-all transform hover:scale-105"
+              onClick={handleAccessBeta}
+              disabled={isCheckingSubscription}
+              className="bg-black text-white px-8 py-3 rounded-full text-base font-medium hover:bg-gray-800 transition-all transform hover:scale-105 disabled:opacity-70 disabled:cursor-wait"
             >
-              Access our Beta →
+              {isCheckingSubscription ? 'Loading...' : 'Access our Beta →'}
             </button>
           </div>
         </div>

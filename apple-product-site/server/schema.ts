@@ -10,6 +10,10 @@ export const users = pgTable("users", {
   resetToken: varchar("reset_token", { length: 255 }),
   resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
+  subscriptionPlan: varchar("subscription_plan", { length: 50 }),
+  subscriptionStatus: varchar("subscription_status", { length: 50 }),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
 });
 
 export type User = typeof users.$inferSelect;

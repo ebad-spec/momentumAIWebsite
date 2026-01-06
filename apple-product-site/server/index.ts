@@ -34,9 +34,32 @@ async function initializeDatabase() {
         verification_token VARCHAR(255),
         reset_token VARCHAR(255),
         reset_token_expiry TIMESTAMP,
-        created_at TIMESTAMP DEFAULT NOW()
+        created_at TIMESTAMP DEFAULT NOW(),
+        subscription_plan VARCHAR(50),
+        subscription_status VARCHAR(50),
+        stripe_customer_id VARCHAR(255),
+        stripe_subscription_id VARCHAR(255)
       )
     `);
+    
+    await pool.query(`
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='subscription_plan') THEN
+          ALTER TABLE users ADD COLUMN subscription_plan VARCHAR(50);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='subscription_status') THEN
+          ALTER TABLE users ADD COLUMN subscription_status VARCHAR(50);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='stripe_customer_id') THEN
+          ALTER TABLE users ADD COLUMN stripe_customer_id VARCHAR(255);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='stripe_subscription_id') THEN
+          ALTER TABLE users ADD COLUMN stripe_subscription_id VARCHAR(255);
+        END IF;
+      END $$;
+    `);
+    
     console.log("Database initialized");
   } catch (error) {
     console.error("Database initialization error:", error);

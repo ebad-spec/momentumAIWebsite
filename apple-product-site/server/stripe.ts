@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { Express, Request, Response } from 'express';
+import { updateUserSubscription, getUserById, getUserByStripeCustomerId } from './storage';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia',
@@ -88,23 +89,64 @@ export function setupStripe(app: Express) {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log('Payment successful:', session);
         
-        // TODO: Update user's subscription in database
-        // const userId = session.metadata?.userId;
-        // const plan = session.metadata?.plan;
-        // await updateUserSubscription(userId, plan, session.subscription);
+        const userId = session.metadata?.userId;
+        const plan = session.metadata?.plan;
+        
+        if (userId && plan) {
+          try {
+            await updateUserSubscription(parseInt(userId), {
+              subscriptionPlan: plan,
+              subscriptionStatus: 'active',
+              stripeCustomerId: session.customer as string,
+              stripeSubscriptionId: session.subscription as string,
+            });
+            console.log(`Updated subscription for user ${userId}: plan=${plan}`);
+          } catch (err) {
+            console.error('Failed to update user subscription:', err);
+          }
+        }
         
         break;
       
       case 'customer.subscription.updated':
         const subscription = event.data.object as Stripe.Subscription;
         console.log('Subscription updated:', subscription);
-        // TODO: Handle subscription updates
+        
+        if (subscription.customer) {
+          const customerId = typeof subscription.customer === 'string' 
+            ? subscription.customer 
+            : subscription.customer.id;
+          
+          const user = await getUserByStripeCustomerId(customerId);
+          if (user) {
+            const status = subscription.status === 'active' || subscription.status === 'trialing' 
+              ? 'active' 
+              : subscription.status;
+            await updateUserSubscription(user.id, {
+              subscriptionStatus: status,
+            });
+            console.log(`Updated subscription status for user ${user.id}: status=${status}`);
+          }
+        }
         break;
       
       case 'customer.subscription.deleted':
         const deletedSubscription = event.data.object as Stripe.Subscription;
         console.log('Subscription cancelled:', deletedSubscription);
-        // TODO: Handle subscription cancellation
+        
+        if (deletedSubscription.customer) {
+          const customerId = typeof deletedSubscription.customer === 'string' 
+            ? deletedSubscription.customer 
+            : deletedSubscription.customer.id;
+          
+          const user = await getUserByStripeCustomerId(customerId);
+          if (user) {
+            await updateUserSubscription(user.id, {
+              subscriptionStatus: 'cancelled',
+            });
+            console.log(`Cancelled subscription for user ${user.id}`);
+          }
+        }
         break;
 
       default:
@@ -121,13 +163,18 @@ export function setupStripe(app: Express) {
         return res.status(401).json({ error: 'Not authenticated' });
       }
 
-      // TODO: Get subscription from database
-      // const subscription = await getUserSubscription(req.user.id);
+      const user = await getUserById(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const hasActiveSubscription = user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing';
       
       res.json({ 
-        hasSubscription: false,
-        plan: null,
-        status: null
+        hasSubscription: hasActiveSubscription,
+        plan: user.subscriptionPlan || null,
+        status: user.subscriptionStatus || null
       });
     } catch (error) {
       console.error('Error fetching subscription:', error);

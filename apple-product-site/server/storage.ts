@@ -46,3 +46,24 @@ export async function getUserByResetToken(token: string): Promise<User | undefin
   const result = await db.select().from(users).where(eq(users.resetToken, token));
   return result[0];
 }
+
+export async function updateUserSubscription(
+  userId: number, 
+  subscriptionData: {
+    subscriptionPlan?: string | null;
+    subscriptionStatus?: string | null;
+    stripeCustomerId?: string | null;
+    stripeSubscriptionId?: string | null;
+  }
+): Promise<User | undefined> {
+  const result = await db.update(users)
+    .set(subscriptionData)
+    .where(eq(users.id, userId))
+    .returning();
+  return result[0];
+}
+
+export async function getUserByStripeCustomerId(customerId: string): Promise<User | undefined> {
+  const result = await db.select().from(users).where(eq(users.stripeCustomerId, customerId));
+  return result[0];
+}
