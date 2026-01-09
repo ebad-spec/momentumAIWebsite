@@ -964,6 +964,13 @@ function Navigation() {
               }`}>
                 Careers
               </Link>
+              <a href="/deck" className={`transition-colors text-xs font-medium ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:text-red-400' 
+                  : 'text-gray-600 hover:text-red-500'
+              }`}>
+                Deck
+              </a>
             </div>
             
             {/* Desktop Auth Buttons */}
@@ -1228,6 +1235,17 @@ function Navigation() {
             >
               Careers
             </Link>
+            <a 
+              href="/deck" 
+              onClick={closeMobileMenu}
+              className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
+                isDarkPage 
+                  ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
+              }`}
+            >
+              Deck
+            </a>
 
             {/* Divider */}
             <div className="h-px bg-gray-200/20 my-4"></div>

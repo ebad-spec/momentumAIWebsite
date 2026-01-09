@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Momentum | Professional Slide Deck</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/white.min.css" id="theme">
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/monokai.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --r-main-font: 'Inter', sans-serif;
+            --r-heading-font: 'Inter', sans-serif;
+            --r-heading-text-transform: none;
+            --r-heading-font-weight: 900;
+            --r-main-color: #2d3436;
+            --r-heading-color: #0984e3;
+            --r-selection-background: #74b9ff;
+            --accent-color: #00cec9;
+        }
+
+        .reveal .slides section {
+            text-align: left;
+            padding: 40px;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            margin-bottom: 0.5em;
+        }
+
+        .reveal h1 {
+            font-size: 3.5em;
+            letter-spacing: -2px;
+        }
+
+        .reveal .subtitle {
+            font-weight: 300;
+            color: #636e72;
+            font-size: 1.2em;
+        }
+
+        .reveal .accent {
+            color: var(--accent-color);
+        }
+
+        .reveal .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        .reveal .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        /* Flashy Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #0984e3, #00cec9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom progress bar */
+        .reveal .progress {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+        }
+        .reveal .progress span {
+            background: var(--r-heading-color);
+        }
+
+        /* Smooth background transitions */
+        .reveal {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Slide 1: Title -->
+            <section data-auto-animate>
+                <div data-id="bar" style="width: 50px; height: 4px; background: var(--accent-color); margin-bottom: 2em;"></div>
+                <h1 class="gradient-text">Momentum</h1>
+                <p class="subtitle">Elevate your vision with seamless motion.</p>
+            </section>
+
+            <!-- Slide 2: Smooth Transition (Auto-Animate) -->
+            <section data-auto-animate>
+                <div class="grid">
+                    <div>
+                        <div data-id="bar" style="width: 100px; height: 4px; background: var(--accent-color); margin-bottom: 1em;"></div>
+                        <h1 class="gradient-text" style="font-size: 2.5em;">Momentum</h1>
+                        <h2 style="font-size: 1.5em;">Unmatched <span class="accent">Precision</span></h2>
+                    </div>
+                    <div class="card">
+                        <p>Designed for professionals who value <strong>clarity</strong>, <strong>impact</strong>, and <strong>fluidity</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Core Capabilities (Fragments) -->
+            <section>
+                <h2 class="gradient-text">Core Capabilities</h2>
+                <div class="grid">
+                    <div>
+                        <ul style="list-style: none; padding: 0;">
+                            <li class="fragment custom fade-in" style="margin-bottom: 20px; display: flex; align-items: center;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color); margin-right: 15px;"></div>
+                                Ultra-Smooth Animations
+                            </li>
+                            <li class="fragment custom fade-in" style="margin-bottom: 20px; display: flex; align-items: center;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--r-heading-color); margin-right: 15px;"></div>
+                                Clean Minimalist Design
+                            </li>
+                            <li class="fragment custom fade-in" style="display: flex; align-items: center;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #6c5ce7; margin-right: 15px;"></div>
+                                High-Impact Delivery
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="fragment fade-left">
+                        <img src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000&auto=format&fit=crop" 
+                             alt="Abstract Art" 
+                             style="border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); width: 100%;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Interactive Background -->
+            <section data-background-gradient="linear-gradient(135deg, #0984e3 0%, #6c5ce7 100%)">
+                <h2 style="color: white;">Ready to scale?</h2>
+                <p style="color: rgba(255,255,255,0.8);">Our framework adapts to your growth, ensuring your message never misses a beat.</p>
+                <div class="fragment zoom-in" style="font-size: 3em; color: white; font-weight: 900; margin-top: 1em; text-align: center;">
+                    DRIVE MOMENTUM.
+                </div>
+            </section>
+
+            <!-- Slide 5: Final -->
+            <section data-auto-animate>
+                <h1 class="gradient-text">Thank <span class="accent">You.</span></h1>
+                <p>Let's build something extraordinary.</p>
+                <div data-id="contact-box" style="margin-top: 2em; padding: 20px; border-left: 4px solid var(--accent-color); background: rgba(0,0,0,0.02);">
+                    <p class="subtitle" style="margin: 0;">hello@momentum.io</p>
+                    <p class="subtitle" style="margin: 0; font-size: 0.9em;">www.momentum.io</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            center: true,
+            transition: 'convex', // none/fade/slide/convex/concave/zoom
+            transitionSpeed: 'slow',
+            autoAnimateEasing: 'ease',
+            autoAnimateDuration: 1.2,
+            autoAnimateUnmatched: true,
+            controls: true,
+            progress: true,
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+        });
+    </script>
+</body>
+</html>
+
