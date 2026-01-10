@@ -88,39 +88,16 @@ export default function DeckPage() {
         </div>
       </div>
 
-      {/* Mobile navigation affordance */}
-      <div className="absolute inset-0 md:hidden pointer-events-none">
-        {/* Left arrow */}
-        <button
-          type="button"
-          aria-label="Previous slide"
-          onClick={goPrev}
-          disabled={currentSlide === 0}
-          className="pointer-events-auto absolute left-2 top-[45%] -translate-y-1/2 rounded-full border border-black/10 bg-white/70 backdrop-blur px-2.5 py-2 shadow-sm text-black/60 hover:text-black/80 active:scale-[0.98] transition disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-
-        {/* Right arrow */}
-        <button
-          type="button"
-          aria-label="Next slide"
-          onClick={goNext}
-          disabled={currentSlide === totalSlides - 1}
-          className="pointer-events-auto absolute right-2 top-[45%] -translate-y-1/2 rounded-full border border-black/10 bg-white/70 backdrop-blur px-2.5 py-2 shadow-sm text-black/60 hover:text-black/80 active:scale-[0.98] transition disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-
-        {/* Hint */}
-        <div className="absolute top-4 right-4 text-xs text-black/40">
-          Swipe or tap arrows
+      {/* Mobile: swipe hint (first slide only) */}
+      {currentSlide === 0 && (
+        <div className="absolute inset-x-0 top-20 md:hidden pointer-events-none flex justify-center">
+          <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 backdrop-blur px-4 py-2 shadow-sm text-[12px] text-black/55 tracking-tight">
+            <span className="text-black/35" aria-hidden="true">‹</span>
+            <span className="font-light">Swipe</span>
+            <span className="text-black/35" aria-hidden="true">›</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

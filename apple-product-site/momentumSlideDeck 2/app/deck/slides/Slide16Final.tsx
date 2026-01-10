@@ -7,15 +7,18 @@ export default function Slide16Final() {
       title="We're Building the Future"
       subtitle="The market is massive. The product works. The team executes. The question isn't if we'll succeed—it's whether you'll be part of it."
       logo={
-        <div className="mb-12">
-          <Image
-            src="/logo.png"
-            alt="Momentum Logo"
-            width={200}
-            height={200}
-            className="object-contain"
-            priority
-          />
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-black/5 rounded-full blur-xl"></div>
+            <Image
+              src="/logo.png"
+              alt="Momentum Logo"
+              width={120}
+              height={120}
+              className="relative object-contain opacity-90"
+              priority
+            />
+          </div>
         </div>
       }
     >

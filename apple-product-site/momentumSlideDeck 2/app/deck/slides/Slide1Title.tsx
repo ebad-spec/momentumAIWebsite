@@ -14,15 +14,18 @@ export default function Slide1Title() {
       }
       subtitle="Your agentic AI platform that turns chaotic semesters into a guided system, helping students plan, study, and succeed from day one instead of scrambling after they fall behind."
       logo={
-        <div className="mb-12">
-          <Image
-            src="/logo.png"
-            alt="Momentum Logo"
-            width={200}
-            height={200}
-            className="object-contain"
-            priority
-          />
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-black/5 rounded-full blur-xl"></div>
+            <Image
+              src="/logo.png"
+              alt="Momentum Logo"
+              width={120}
+              height={120}
+              className="relative object-contain opacity-90"
+              priority
+            />
+          </div>
         </div>
       }
     >

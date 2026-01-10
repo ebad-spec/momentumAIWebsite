@@ -12,7 +12,15 @@ export default function TitleSlideLayout({
   logo,
 }: TitleSlideLayoutProps) {
   return (
-    <div className="h-full flex flex-col items-center justify-center text-center px-8 md:px-16 py-8 bg-white/0 relative z-10">
+    <div
+      className="
+        min-h-[100dvh] md:min-h-full md:h-full
+        flex flex-col items-center justify-center text-center
+        px-8 md:px-16
+        py-10 md:py-8
+        bg-white/0 relative z-10
+      "
+    >
       {logo && (
         <div className="scale-enter mb-8" style={{ animationDelay: '0.05s', opacity: 0, animationFillMode: 'forwards' }}>
           {logo}
