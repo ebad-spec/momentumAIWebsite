@@ -75,20 +75,21 @@ async function initializeDatabase() {
 setupAuth(app);
 setupStripe(app);
 
-// Serve the built slide deck at /deck
-// The out folder is where the built Next.js files live
-const deckOutPath = path.join(__dirname, "../momentumSlideDeck 2/out");
+// Serve the built slide deck at /deck.
+// IMPORTANT: In production deployments (e.g. Replit), the deck must be built during the build step.
+// We serve from ../public/deck because `npm run build:deck` copies the Next.js export into that folder.
+const deckPublicPath = path.join(__dirname, "../public/deck");
 
-// Serve deck.html for /deck route (with or without trailing slash)
+// Serve the deck index for /deck route (with or without trailing slash)
 app.get('/deck', (req, res) => {
-  res.sendFile(path.join(deckOutPath, "deck.html"));
+  res.sendFile(path.join(deckPublicPath, "index.html"));
 });
 app.get('/deck/', (req, res) => {
-  res.sendFile(path.join(deckOutPath, "deck.html"));
+  res.sendFile(path.join(deckPublicPath, "index.html"));
 });
 
-// Serve static files from the deck out directory
-app.use('/deck', express.static(deckOutPath));
+// Serve static files from the deck public directory
+app.use('/deck', express.static(deckPublicPath));
 
 app.use(express.static(path.join(__dirname, "../build")));
 
