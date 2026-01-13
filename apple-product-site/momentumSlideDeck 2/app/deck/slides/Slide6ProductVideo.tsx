@@ -24,6 +24,7 @@ export default function Slide6ProductVideo() {
               playsInline
               controls
               preload="metadata"
+              poster="/deck/logo.png"
             >
               <source src="/deck/Momentum.mp4" type="video/mp4" />
               <source src="/Momentum.mp4" type="video/mp4" />
