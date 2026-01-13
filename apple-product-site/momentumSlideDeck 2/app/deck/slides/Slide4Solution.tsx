@@ -2,26 +2,26 @@
 
 export default function Slide4Solution() {
   return (
-    <div className="h-full flex flex-col px-12 md:px-20 pt-12 md:pt-16 pb-40 bg-white/0 relative z-10">
+    <div className="h-full flex flex-col px-12 md:px-20 pt-10 md:pt-12 pb-40 bg-white/0 relative z-10">
       {/* Title */}
-      <div className="mb-6 md:mb-8 slide-enter" style={{ animationDelay: '0.05s', opacity: 0, animationFillMode: 'forwards' }}>
+      <div className="mb-4 md:mb-6 slide-enter" style={{ animationDelay: '0.05s', opacity: 0, animationFillMode: 'forwards' }}>
         <h2 className="text-4xl md:text-5xl font-light text-black tracking-tight mb-2">The Solution: A Semester-Native System, Not Another Study App</h2>
         <p className="text-lg md:text-xl text-black/40 font-light leading-snug tracking-tight max-w-3xl mt-2">
           A single, guided system that manages the workload. Not reactive AI—proactive, structured, and adaptive.
         </p>
-        <div className="mt-4 mb-2 px-4 py-2 bg-black/5 border border-black/10 rounded-xl inline-block">
+        <div className="mt-3 md:mt-4 mb-2 px-4 py-2 bg-black/5 border border-black/10 rounded-xl inline-block">
           <p className="text-base md:text-lg font-light text-black italic">
             Momentum is built around the semester as the core object, not notes, chats, or flashcards.
           </p>
         </div>
-        <div className="w-16 h-1 bg-black/10 rounded-full mt-3 underline-reveal"></div>
+        <div className="w-16 h-1 bg-black/10 rounded-full mt-2 md:mt-3 underline-reveal"></div>
       </div>
 
       {/* Main Content - Visual Flow */}
-      <div className="flex-1 flex flex-col justify-center min-h-0">
+      <div className="flex-1 flex flex-col justify-center min-h-0 -mt-2 md:mt-0">
         {/* Before: Three Separate Services */}
-        <div className="mb-4 md:mb-6">
-          <div className="text-center mb-3 md:mb-4 slide-enter" style={{ animationDelay: '0.15s', opacity: 0, animationFillMode: 'forwards' }}>
+        <div className="mb-3 md:mb-4">
+          <div className="text-center mb-2 md:mb-3 slide-enter" style={{ animationDelay: '0.15s', opacity: 0, animationFillMode: 'forwards' }}>
             <p className="text-sm md:text-base text-black/40 font-light uppercase tracking-wider">Before: Fragmented Stack</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">

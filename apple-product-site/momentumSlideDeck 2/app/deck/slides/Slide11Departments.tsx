@@ -1,6 +1,7 @@
 'use client'
 
 import type React from 'react'
+import Image from 'next/image'
 
 export default function Slide11Departments() {
   const departments = [
@@ -152,7 +153,13 @@ export default function Slide11Departments() {
               animationFillMode: 'forwards'
             }}
           >
-            <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-black/10" />
+            <Image
+              src="/logo.png"
+              alt="Momentum Logo"
+              width={56}
+              height={56}
+              className="object-contain opacity-90"
+            />
           </div>
 
           {/* Connection Circle - SVG overlay (static, no rotation) */}
