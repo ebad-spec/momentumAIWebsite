@@ -17,14 +17,17 @@ export default function Slide6ProductVideo() {
         <div className="w-full max-w-5xl">
           <div className="relative rounded-[2rem] border border-black/10 bg-white/70 shadow-[0_24px_60px_rgba(0,0,0,0.08)] overflow-hidden">
             <video
-              src="/Momentum.mp4"
               className="w-full h-full object-cover"
               autoPlay
               loop
               muted
               playsInline
               controls
-            />
+              preload="metadata"
+            >
+              <source src="/deck/Momentum.mp4" type="video/mp4" />
+              <source src="/Momentum.mp4" type="video/mp4" />
+            </video>
           </div>
         </div>
       </div>
