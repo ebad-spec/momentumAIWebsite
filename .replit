@@ -24,7 +24,7 @@ externalPort = 80
 
 [deployment]
 deploymentTarget = "cloudrun"
-build = ["sh", "-c", "npm run build --prefix apple-product-site"]
+build = ["sh", "-c", "npm run build:deck --prefix apple-product-site && npm run build --prefix apple-product-site"]
 run = ["sh", "-c", "npm run server --prefix apple-product-site"]
 
 [agent]

@@ -26,7 +26,9 @@ export default function Slide6ProductVideo() {
               preload="metadata"
               poster="/deck/logo.png"
             >
+              <source src="/deck/Momentum.web.mp4" type="video/mp4" />
               <source src="/deck/Momentum.mp4" type="video/mp4" />
+              <source src="/Momentum.web.mp4" type="video/mp4" />
               <source src="/Momentum.mp4" type="video/mp4" />
             </video>
           </div>
