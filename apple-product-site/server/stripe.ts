@@ -4,11 +4,11 @@ import { updateUserSubscription, getUserById, getUserByStripeCustomerId } from '
 import { isSupabaseConfigured, refreshSupabaseSession, createOneTimeCode } from './supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-12-15.clover',
 });
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-const MOMENTUM_AI_APP_BASE_URL = process.env.MOMENTUM_AI_APP_BASE_URL || 'https://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
+const MOMENTUM_AI_APP_BASE_URL = process.env.MOMENTUM_AI_APP_BASE_URL || 'http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
 
 export function setupStripe(app: Express) {
   // Create Stripe checkout session
@@ -371,8 +371,14 @@ export function setupStripe(app: Express) {
       }
 
       // Get subscription to find when current period ends
-      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      const periodEnd = new Date(subscription.current_period_end * 1000);
+      const subscription = (await stripe.subscriptions.retrieve(
+        user.stripeSubscriptionId
+      )) as Stripe.Subscription;
+      const currentPeriodEnd = subscription.items.data[0]?.current_period_end;
+      if (!currentPeriodEnd) {
+        return res.status(500).json({ error: 'Unable to determine subscription period end' });
+      }
+      const periodEnd = new Date(currentPeriodEnd * 1000);
 
       // Cancel the subscription at period end (so user keeps access until then)
       await stripe.subscriptions.update(user.stripeSubscriptionId, {

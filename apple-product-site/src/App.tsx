@@ -41,7 +41,7 @@ function HomePage() {
         credentials: 'include',
       });
       
-      if (subscriptionResponse.ok) {
+          if (subscriptionResponse.ok) {
         const data = await subscriptionResponse.json();
         
         if (data.hasSubscription) {
@@ -57,7 +57,7 @@ function HomePage() {
             }
           }
           // Fallback if launch endpoint fails
-          window.location.href = process.env.REACT_APP_MOMENTUM_AI_URL || 'https://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
+          window.location.href = process.env.REACT_APP_MOMENTUM_AI_URL || 'http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
           return;
         }
       }
