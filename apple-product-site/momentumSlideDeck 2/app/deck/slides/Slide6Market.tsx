@@ -17,8 +17,8 @@ export default function Slide6Market() {
     {
       category: 'SOM',
       categoryLabel: 'Serviceable Obtainable Market',
-      value: '$3–4M CAD',
-      label: '~25K students × $144/year (Ontario, 5% penetration)',
+      value: '$200–500M CAD',
+      label: '~1.4M–3.5M students × $144/year (North America, 15–20% penetration in 5 years)',
     },
   ]
 
@@ -27,7 +27,7 @@ export default function Slide6Market() {
       <div className="mb-8 md:mb-10 slide-enter" style={{ animationDelay: '0.05s', opacity: 0, animationFillMode: 'forwards' }}>
         <h2 className="text-5xl md:text-6xl font-light text-black tracking-tight mb-3">Market Potential</h2>
         <p className="text-xl md:text-2xl text-black/40 font-light leading-snug tracking-tight max-w-3xl">
-          Conservative market sizing for English-speaking post-secondary students globally.
+          Venture-scale opportunity: $7.2B TAM with clear path to $200M+ market capture.
         </p>
         <div className="w-16 h-1 bg-black/10 rounded-full mt-4 underline-reveal"></div>
       </div>

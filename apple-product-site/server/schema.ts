@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
   trialEndDate: timestamp("trial_end_date"),
   subscriptionEndDate: timestamp("subscription_end_date"),
+  supabaseRefreshToken: text("supabase_refresh_token"),
 });
 
 export type User = typeof users.$inferSelect;

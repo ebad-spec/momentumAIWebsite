@@ -1,12 +1,32 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
+const DEFAULT_PLATFORM_URL = process.env.REACT_APP_MOMENTUM_AI_URL || 'https://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
+
 const PaymentSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [isVisible, setIsVisible] = useState(false);
+  const [launching, setLaunching] = useState(false);
   const circleRef = useRef<SVGCircleElement>(null);
   const checkRef = useRef<SVGPathElement>(null);
   const sessionId = searchParams.get('session_id');
+
+  const handleLaunchPlatform = async () => {
+    setLaunching(true);
+    try {
+      const res = await fetch('/api/momentum-launch', { credentials: 'include' });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+      window.location.href = DEFAULT_PLATFORM_URL;
+    } catch {
+      window.location.href = DEFAULT_PLATFORM_URL;
+    } finally {
+      setLaunching(false);
+    }
+  };
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 100);
@@ -138,12 +158,14 @@ const PaymentSuccess: React.FC = () => {
 
           {/* Action Buttons - Circular/Pill Style */}
           <div className="space-y-3">
-            <a 
-              href="http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com"
-              className="block w-full bg-black text-white px-8 py-4 rounded-full text-base font-medium hover:bg-gray-800 transition-all duration-200 text-center"
+            <button
+              type="button"
+              onClick={handleLaunchPlatform}
+              disabled={launching}
+              className="block w-full bg-black text-white px-8 py-4 rounded-full text-base font-medium hover:bg-gray-800 transition-all duration-200 text-center disabled:opacity-70 disabled:cursor-wait"
             >
-              Launch Platform
-            </a>
+              {launching ? 'Launching...' : 'Launch Platform'}
+            </button>
             <Link 
               to="/"
               className="block w-full bg-white border border-gray-300 text-gray-900 px-8 py-4 rounded-full text-base font-medium hover:bg-gray-50 transition-all duration-200 text-center"

@@ -7,6 +7,14 @@ import crypto from "crypto";
 import { sessionStore, getUserById, getUserByEmail, createUser, updateUser, getUserByVerificationToken, getUserByResetToken } from "./storage";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendVerificationCodeEmail, generateVerificationCode } from "./email";
 import { User } from "./schema";
+import {
+  isSupabaseConfigured,
+  createSupabaseUser,
+  getSupabaseSessionWithPassword,
+  refreshSupabaseSession,
+  createOneTimeCode,
+  exchangeOneTimeCode,
+} from "./supabase";
 
 declare global {
   namespace Express {
@@ -205,6 +213,25 @@ export function setupAuth(app: Express) {
         emailVerified: true, // Email is verified since they entered the code
       });
 
+      // Create Supabase user (same project as Momentum-AI) and store refresh_token for session handoff after payment
+      if (isSupabaseConfigured()) {
+        try {
+          const supabaseCreate = await createSupabaseUser(storedData.email, storedData.password);
+          if ("error" in supabaseCreate && supabaseCreate.status !== 422) {
+            console.warn("Supabase user create failed (non-422):", supabaseCreate.error);
+          }
+          // Get session (works for new user or existing Supabase user)
+          const sessionResult = await getSupabaseSessionWithPassword(storedData.email, storedData.password);
+          if (!("error" in sessionResult)) {
+            await updateUser(user.id, { supabaseRefreshToken: sessionResult.refresh_token });
+          } else {
+            console.warn("Supabase session failed:", sessionResult.error);
+          }
+        } catch (err) {
+          console.error("Supabase sync during sign-up:", err);
+        }
+      }
+
       // Clean up the verification code
       verificationCodes.delete(email);
 
@@ -295,6 +322,24 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error("Forgot password error:", error);
       res.status(500).json({ error: "Failed to process request" });
+    }
+  });
+
+  // One-time code exchange for Momentum-AI: /auth/callback receives code, calls this to get tokens, then setSession
+  app.get("/api/auth/momentum-exchange", async (req: Request, res: Response) => {
+    try {
+      const code = typeof req.query.code === "string" ? req.query.code : null;
+      if (!code) {
+        return res.status(400).json({ error: "Missing code" });
+      }
+      const tokens = exchangeOneTimeCode(code);
+      if (!tokens) {
+        return res.status(404).json({ error: "Invalid or expired code" });
+      }
+      res.json({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
+    } catch (error) {
+      console.error("Momentum exchange error:", error);
+      res.status(500).json({ error: "Exchange failed" });
     }
   });
 

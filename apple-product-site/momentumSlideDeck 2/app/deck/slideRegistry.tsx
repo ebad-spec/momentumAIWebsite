@@ -16,6 +16,7 @@ import Slide12EngineeringTeam from './slides/Slide12EngineeringTeam'
 import Slide13BoardMembers from './slides/Slide13BoardMembers'
 import Slide14Ask from './slides/Slide14Ask'
 import Slide15UseOfFunds from './slides/Slide15UseOfFunds'
+import Slide16Valuation from './slides/Slide16Valuation'
 import Slide16Final from './slides/Slide16Final'
 import Slide17StudentDemand from './slides/Slide17StudentDemand'
 import Slide18WhyMomentum from './slides/Slide18WhyMomentum'
@@ -114,11 +115,16 @@ export const slides: SlideConfig[] = [
   },
   {
     id: 18,
+    title: 'Company Valuation',
+    component: Slide16Valuation,
+  },
+  {
+    id: 19,
     title: 'Future & Milestones',
     component: Slide10Future,
   },
   {
-    id: 19,
+    id: 20,
     title: 'Thank You',
     component: Slide16Final,
   },

@@ -1,12 +1,14 @@
 import Stripe from 'stripe';
 import { Express, Request, Response } from 'express';
 import { updateUserSubscription, getUserById, getUserByStripeCustomerId } from './storage';
+import { isSupabaseConfigured, refreshSupabaseSession, createOneTimeCode } from './supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia',
 });
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const MOMENTUM_AI_APP_BASE_URL = process.env.MOMENTUM_AI_APP_BASE_URL || 'https://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
 
 export function setupStripe(app: Express) {
   // Create Stripe checkout session
@@ -205,7 +207,7 @@ export function setupStripe(app: Express) {
         });
         
         console.log(`Verified and updated subscription for user ${req.user.id}: plan=${plan}, trial ends ${trialEndDate}`);
-        
+
         res.json({ success: true, plan, status: 'trialing' });
       } else {
         res.status(400).json({ error: 'Session does not match user' });
@@ -260,6 +262,50 @@ export function setupStripe(app: Express) {
     } catch (error) {
       console.error('Error fetching subscription:', error);
       res.status(500).json({ error: 'Failed to fetch subscription' });
+    }
+  });
+
+  // Launch Momentum-AI: when user clicks "Access our Beta", return redirect URL with one-time code so they land signed in (no Supabase login page)
+  app.get('/api/momentum-launch', async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const user = await getUserById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const now = new Date();
+      let hasActiveAccess = false;
+      if (user.trialEndDate && new Date(user.trialEndDate) > now) {
+        hasActiveAccess = true;
+      } else if (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing') {
+        hasActiveAccess = true;
+      } else if (user.subscriptionStatus === 'cancelled' && user.subscriptionEndDate && new Date(user.subscriptionEndDate) > now) {
+        hasActiveAccess = true;
+      }
+
+      if (!hasActiveAccess) {
+        return res.status(403).json({ error: 'Active subscription required' });
+      }
+
+      const baseUrl = MOMENTUM_AI_APP_BASE_URL.replace(/\/$/, '');
+      let redirectUrl = baseUrl;
+
+      if (isSupabaseConfigured() && user.supabaseRefreshToken) {
+        const refreshed = await refreshSupabaseSession(user.supabaseRefreshToken);
+        if (refreshed && !('error' in refreshed)) {
+          const code = createOneTimeCode(refreshed);
+          redirectUrl = `${baseUrl}/auth/callback?code=${encodeURIComponent(code)}`;
+        }
+      }
+
+      res.json({ redirectUrl });
+    } catch (error) {
+      console.error('Error generating momentum launch URL:', error);
+      res.status(500).json({ error: 'Failed to launch' });
     }
   });
 

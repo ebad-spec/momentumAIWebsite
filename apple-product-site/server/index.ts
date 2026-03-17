@@ -63,6 +63,9 @@ async function initializeDatabase() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='subscription_end_date') THEN
           ALTER TABLE users ADD COLUMN subscription_end_date TIMESTAMP;
         END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='supabase_refresh_token') THEN
+          ALTER TABLE users ADD COLUMN supabase_refresh_token TEXT;
+        END IF;
       END $$;
     `);
     

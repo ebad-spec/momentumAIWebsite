@@ -148,10 +148,10 @@ style: |
 <div class="medium-number">$2.9B</div>
 **SAM:** 20M students x $144/year (US, Canada, UK, AU)
 
-<div class="medium-number">$3–4M</div>
-**SOM:** Ontario at 3–5% penetration (25K students)
+<div class="medium-number">$200–500M</div>
+**SOM:** North America at 15–20% penetration in 5 years (1.4M–3.5M students)
 
-**Why investors care:** Clear beachhead with global upside
+**Why investors care:** Venture-scale opportunity with $7.2B TAM and clear path to $200M+ market capture
 
 ---
 

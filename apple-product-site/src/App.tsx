@@ -15,8 +15,6 @@ import { useSmoothScroll } from './hooks/useSmoothScroll';
 import { preloadImages } from './utils/preloadImages';
 import { useAuth } from './hooks/useAuth';
 
-const PLATFORM_URL = "http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com";
-
 function HomePage() {
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
@@ -47,7 +45,19 @@ function HomePage() {
         const data = await subscriptionResponse.json();
         
         if (data.hasSubscription) {
-          window.location.href = PLATFORM_URL;
+          // Get redirect URL (with one-time code when possible so they land signed in on Momentum-AI)
+          const launchResponse = await fetch('/api/momentum-launch', {
+            credentials: 'include',
+          });
+          if (launchResponse.ok) {
+            const launch = await launchResponse.json();
+            if (launch.redirectUrl) {
+              window.location.href = launch.redirectUrl;
+              return;
+            }
+          }
+          // Fallback if launch endpoint fails
+          window.location.href = process.env.REACT_APP_MOMENTUM_AI_URL || 'https://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
           return;
         }
       }
