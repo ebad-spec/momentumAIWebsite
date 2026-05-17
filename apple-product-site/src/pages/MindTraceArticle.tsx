@@ -45,6 +45,9 @@ const MindTraceArticle: React.FC = () => {
             <p className="byline article-hero-byline">
               Momentum Research Team &nbsp;·&nbsp; May 2026
             </p>
+            <p className="article-approval">
+              Reviewed and approved by Ebad Khan — Co-founder and CEO, Momentum AI
+            </p>
           </div>
           <div className="article-hero-media">
             <img
