@@ -80,7 +80,7 @@
   backface-visibility: hidden;
 }
 
-/* Headline + thumbnail share the first screen (legacy / unused on article page) */
+/* Headline + thumbnail share the first screen */
 .mindtrace-article .article-hero {
   display: grid;
   grid-template-columns: 1fr;

@@ -4,8 +4,7 @@ import '../styles/mindtrace-article.css';
 import { useMindtraceCharts } from '../hooks/useMindtraceCharts';
 import { useArticleMeta } from '../hooks/useArticleMeta';
 
-const BANNER = '/research/mindtrace/banner.png';
-const BANNER_2X = BANNER;
+const HERO = '/research/mindtrace/image-1.png';
 const PHASES = '/research/mindtrace/image-2.png';
 
 const MindTraceArticle: React.FC = () => {
@@ -21,7 +20,7 @@ const MindTraceArticle: React.FC = () => {
     title: 'Introducing MindTrace — Momentum Research',
     description:
       'A cognitive profile model built from implicit student feedback signals—latency, hesitation, and error clustering.',
-    imagePath: BANNER,
+    imagePath: HERO,
   });
 
   return (
@@ -31,25 +30,32 @@ const MindTraceArticle: React.FC = () => {
           ← Research Index
         </Link>
 
-        <img
-          src={BANNER}
-          alt="MindTrace — A cognitive model built from how you study"
-          className="article-banner"
-          decoding="async"
-          fetchPriority="high"
-        />
-
         <div className="meta-bar">
           <span className="meta-logo">Momentum Research</span>
           <span className="meta-dot">·</span>
           <span className="meta-tag">Research</span>
         </div>
 
-        <h1>
-          Introducing MindTrace: a cognitive profile model that learns how you think, built from
-          implicit student feedback signals
-        </h1>
-        <p className="byline">Momentum Research Team &nbsp;·&nbsp; May 2026</p>
+        <div className="article-hero">
+          <div className="article-hero-text">
+            <h1>
+              Introducing MindTrace: a cognitive profile model that learns how you think, built from
+              implicit student feedback signals
+            </h1>
+            <p className="byline article-hero-byline">
+              Momentum Research Team &nbsp;·&nbsp; May 2026
+            </p>
+          </div>
+          <div className="article-hero-media">
+            <img
+              src={HERO}
+              alt="MindTrace — A cognitive model built from how you study"
+              className="thumbnail"
+              decoding="async"
+              fetchPriority="high"
+            />
+          </div>
+        </div>
 
         <p>
           Most study tools treat every student the same. You get a flashcard wrong, the app schedules

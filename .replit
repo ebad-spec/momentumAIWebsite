@@ -26,6 +26,10 @@ externalPort = 80
 localPort = 5001
 externalPort = 3000
 
+[[ports]]
+localPort = 5002
+externalPort = 3003
+
 [deployment]
 deploymentTarget = "cloudrun"
 build = ["sh", "-c", "npm run build:deck --prefix apple-product-site && npm run build --prefix apple-product-site"]

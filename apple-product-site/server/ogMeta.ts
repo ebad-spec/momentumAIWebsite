@@ -55,7 +55,7 @@ const OG_PAGES: Record<string, OgPageConfig> = {
       "Introducing MindTrace — Momentum Research",
     description:
       "A cognitive profile model built from implicit student feedback signals: response latency, hesitation patterns, and error clustering—without asking students to rate their own confidence.",
-    imagePath: "/research/mindtrace/banner.png",
+    imagePath: "/research/mindtrace/image-1.png",
     canonicalPath: "/research/mindtrace",
   },
   "/research": {
