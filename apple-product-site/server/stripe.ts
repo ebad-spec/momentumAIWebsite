@@ -1,14 +1,42 @@
 import Stripe from 'stripe';
 import { Express, Request, Response } from 'express';
 import { updateUserSubscription, getUserById, getUserByStripeCustomerId } from './storage';
-import { isSupabaseConfigured, refreshSupabaseSession, createOneTimeCode } from './supabase';
+import { isSupabaseConfigured, refreshSupabaseSession, createOneTimeCode, getSupabaseSessionWithPassword } from './supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-12-15.clover',
 });
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-const MOMENTUM_AI_APP_BASE_URL = process.env.MOMENTUM_AI_APP_BASE_URL || 'http://ec2-18-119-10-247.us-east-2.compute.amazonaws.com';
+/**
+ * Where Stripe redirects after pay / cancel.
+ *
+ * Priority:
+ * 1. STRIPE_CHECKOUT_APP_URL — explicit (staging, custom port, etc.)
+ * 2. If Stripe is in TEST mode (sk_test_*) — use local CRA dev URL so Replit can
+ *    keep FRONTEND_URL=https://mntm.ca for emails while checkouts still return
+ *    to localhost. Override with STRIPE_DEV_CHECKOUT_APP_URL if needed.
+ * 3. FRONTEND_URL — production / live checkout return host
+ */
+function checkoutFrontendOrigin(): string {
+  const explicit = process.env.STRIPE_CHECKOUT_APP_URL?.trim();
+  if (explicit) {
+    return explicit.replace(/\/+$/, "");
+  }
+
+  const stripeKey = process.env.STRIPE_SECRET_KEY || "";
+  if (stripeKey.startsWith("sk_test_")) {
+    const dev =
+      process.env.STRIPE_DEV_CHECKOUT_APP_URL?.trim() || "http://localhost:3001";
+    return dev.replace(/\/+$/, "");
+  }
+
+  const base = process.env.FRONTEND_URL?.trim() || "http://localhost:3001";
+  return base.replace(/\/+$/, "");
+}
+
+const MOMENTUM_AI_APP_BASE_URL =
+  process.env.MOMENTUM_AI_APP_BASE_URL?.trim().replace(/\/+$/, "") ||
+  "http://localhost:56160";
 
 export function setupStripe(app: Express) {
   // Create Stripe checkout session
@@ -39,13 +67,15 @@ export function setupStripe(app: Express) {
       ];
 
       // Create Stripe checkout session with free trial
+      const appOrigin = checkoutFrontendOrigin();
+      console.log("[Stripe] checkout return origin:", appOrigin);
       console.log('Creating checkout session with 7-day trial for plan:', plan);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'subscription',
-        success_url: `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${FRONTEND_URL}/`,
+        success_url: `${appOrigin}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appOrigin}/`,
         customer_email: req.user.email,
         client_reference_id: req.user.id.toString(),
         metadata: {
@@ -102,7 +132,7 @@ export function setupStripe(app: Express) {
               ? new Date(subscription.trial_end * 1000) 
               : null;
             
-            await updateUserSubscription(parseInt(userId), {
+            await updateUserSubscription(userId, {
               subscriptionPlan: plan,
               subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : 'active',
               stripeCustomerId: session.customer as string,
@@ -188,7 +218,7 @@ export function setupStripe(app: Express) {
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan;
       
-      if (userId && parseInt(userId) === req.user.id && plan) {
+      if (userId && userId === req.user.id && plan) {
         // Get the subscription to find trial end date
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
         

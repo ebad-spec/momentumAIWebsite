@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   emailVerified: boolean;

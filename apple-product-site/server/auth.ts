@@ -4,27 +4,39 @@ import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { sessionStore, getUserById, getUserByEmail, createUser, updateUser, getUserByVerificationToken, getUserByResetToken } from "./storage";
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendVerificationCodeEmail, generateVerificationCode } from "./email";
-import { User } from "./schema";
 import {
-  isSupabaseConfigured,
-  createSupabaseUser,
+  sessionStore,
+  getUserById,
+  getUserByEmail,
+  createUser,
+  updateUser,
+  getUserByResetToken,
+  updateUserSubscription,
+} from "./storage";
+import {
+  sendVerificationCodeEmail,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+  generateVerificationCode,
+} from "./email";
+import { User as SchemaUser } from "./schema";
+import {
   getSupabaseSessionWithPassword,
-  refreshSupabaseSession,
+  updateSupabaseUserPassword,
   createOneTimeCode,
   exchangeOneTimeCode,
 } from "./supabase";
 
 declare global {
   namespace Express {
-    interface User extends Omit<import("./schema").User, "password"> {}
+    interface User extends SchemaUser {}
   }
 }
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex"),
+    secret:
+      process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex"),
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
@@ -45,18 +57,24 @@ export function setupAuth(app: Express) {
       { usernameField: "email" },
       async (email, password, done) => {
         try {
+          // Verify credentials via Supabase Auth and capture the refresh token
+          const result = await getSupabaseSessionWithPassword(email, password);
+          if ("error" in result) {
+            return done(null, false, { message: "Invalid email or password" });
+          }
+
+          // Fetch the full user profile
           const user = await getUserByEmail(email);
           if (!user) {
-            return done(null, false, { message: "Invalid email or password" });
+            return done(null, false, { message: "User not found" });
           }
-          
-          const isValid = await bcrypt.compare(password, user.password);
-          if (!isValid) {
-            return done(null, false, { message: "Invalid email or password" });
-          }
-          
-          const { password: _, ...userWithoutPassword } = user;
-          return done(null, userWithoutPassword);
+
+          // Persist latest refresh token so momentum-launch can hand off the session
+          updateUser(user.id, { supabaseRefreshToken: result.refresh_token }).catch(
+            (err) => console.error("Failed to store refresh token:", err)
+          );
+
+          return done(null, user);
         } catch (error) {
           return done(error);
         }
@@ -65,50 +83,43 @@ export function setupAuth(app: Express) {
   );
 
   passport.serializeUser((user: Express.User, done) => {
-    done(null, user.id);
+    done(null, user.id); // UUID string
   });
 
-  passport.deserializeUser(async (id: number, done) => {
+  passport.deserializeUser(async (id: string, done) => {
     try {
       const user = await getUserById(id);
-      if (user) {
-        const { password: _, ...userWithoutPassword } = user;
-        done(null, userWithoutPassword);
-      } else {
-        done(null, null);
-      }
+      done(null, user ?? null);
     } catch (error) {
       done(error);
     }
   });
 
-  // OLD ENDPOINT - DISABLED (now using 2-step verification)
-  // app.post("/api/register", async (req: Request, res: Response) => {
-  //   ... commented out to use new 2-step verification flow
-  // });
-
   app.post("/api/login", (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
-      if (err) {
-        return res.status(500).json({ error: "Authentication failed" });
+    passport.authenticate(
+      "local",
+      (
+        err: Error | null,
+        user: Express.User | false,
+        info: { message: string } | undefined
+      ) => {
+        if (err) return res.status(500).json({ error: "Authentication failed" });
+        if (!user)
+          return res
+            .status(401)
+            .json({ error: info?.message || "Invalid credentials" });
+        req.login(user, (loginErr) => {
+          if (loginErr)
+            return res.status(500).json({ error: "Failed to log in" });
+          res.json({ user, message: "Logged in successfully" });
+        });
       }
-      if (!user) {
-        return res.status(401).json({ error: info?.message || "Invalid credentials" });
-      }
-      req.login(user, (loginErr) => {
-        if (loginErr) {
-          return res.status(500).json({ error: "Failed to log in" });
-        }
-        res.json({ user, message: "Logged in successfully" });
-      });
-    })(req, res, next);
+    )(req, res, next);
   });
 
   app.post("/api/logout", (req: Request, res: Response) => {
     req.logout((err) => {
-      if (err) {
-        return res.status(500).json({ error: "Failed to log out" });
-      }
+      if (err) return res.status(500).json({ error: "Failed to log out" });
       res.json({ message: "Logged out successfully" });
     });
   });
@@ -120,197 +131,157 @@ export function setupAuth(app: Express) {
     res.json({ user: req.user });
   });
 
-  // Temporary storage for verification codes (in production, use Redis or database)
-  const verificationCodes = new Map<string, { code: string; email: string; name: string; password: string; expiresAt: number }>();
+  // In-memory store for signup verification codes (10-minute TTL)
+  const verificationCodes = new Map<
+    string,
+    {
+      code: string;
+      email: string;
+      name: string;
+      password: string;
+      expiresAt: number;
+    }
+  >();
 
   // Step 1: Send verification code
-  app.post("/api/send-verification-code", async (req: Request, res: Response) => {
-    try {
-      const { email, password, name } = req.body;
-      
-      if (!email || !password || !name) {
-        return res.status(400).json({ error: "Email, password, and name are required" });
-      }
-
-      if (password.length < 8) {
-        return res.status(400).json({ error: "Password must be at least 8 characters" });
-      }
-
-      const existingUser = await getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
-      }
-
-      const code = generateVerificationCode();
-      const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-      // Store verification code
-      verificationCodes.set(email, {
-        code,
-        email,
-        name,
-        password,
-        expiresAt
-      });
-
-      // Clean up expired codes
-      for (const [key, value] of verificationCodes.entries()) {
-        if (value.expiresAt < Date.now()) {
-          verificationCodes.delete(key);
-        }
-      }
-
+  app.post(
+    "/api/send-verification-code",
+    async (req: Request, res: Response) => {
       try {
-        await sendVerificationCodeEmail(email, code, name);
-      } catch (emailError) {
-        console.error("Failed to send verification code:", emailError);
-        return res.status(500).json({ error: "Failed to send verification code" });
-      }
+        const { email, password, name } = req.body;
 
-      res.status(200).json({ 
-        message: "Verification code sent to your email",
-        email 
-      });
-    } catch (error) {
-      console.error("Send verification code error:", error);
-      res.status(500).json({ error: "Failed to send verification code" });
+        if (!email || !password || !name) {
+          return res
+            .status(400)
+            .json({ error: "Email, password, and name are required" });
+        }
+        if (password.length < 8) {
+          return res
+            .status(400)
+            .json({ error: "Password must be at least 8 characters" });
+        }
+
+        const existingUser = await getUserByEmail(email);
+        if (existingUser) {
+          return res.status(400).json({ error: "Email already registered" });
+        }
+
+        const code = generateVerificationCode();
+        const expiresAt = Date.now() + 10 * 60 * 1000;
+
+        verificationCodes.set(email, { code, email, name, password, expiresAt });
+
+        // Clean up stale codes
+        for (const [key, value] of verificationCodes.entries()) {
+          if (value.expiresAt < Date.now()) verificationCodes.delete(key);
+        }
+
+        try {
+          await sendVerificationCodeEmail(email, code, name);
+        } catch (emailError) {
+          console.error("Failed to send verification code:", emailError);
+          return res
+            .status(500)
+            .json({ error: "Failed to send verification code" });
+        }
+
+        res.status(200).json({ message: "Verification code sent to your email", email });
+      } catch (error) {
+        console.error("Send verification code error:", error);
+        res.status(500).json({ error: "Failed to send verification code" });
+      }
     }
-  });
+  );
 
   // Step 2: Verify code and create account
-  app.post("/api/verify-code-and-register", async (req: Request, res: Response) => {
-    try {
-      const { email, code } = req.body;
-      
-      if (!email || !code) {
-        return res.status(400).json({ error: "Email and code are required" });
-      }
-
-      const storedData = verificationCodes.get(email);
-      
-      if (!storedData) {
-        return res.status(400).json({ error: "Verification code not found or expired" });
-      }
-
-      if (storedData.expiresAt < Date.now()) {
-        verificationCodes.delete(email);
-        return res.status(400).json({ error: "Verification code has expired" });
-      }
-
-      if (storedData.code !== code) {
-        return res.status(400).json({ error: "Invalid verification code" });
-      }
-
-      // Code is valid, create the user
-      const hashedPassword = await bcrypt.hash(storedData.password, 10);
-      const verificationToken = crypto.randomBytes(32).toString("hex");
-
-      const user = await createUser({
-        email: storedData.email,
-        password: hashedPassword,
-        name: storedData.name,
-        verificationToken,
-        emailVerified: true, // Email is verified since they entered the code
-      });
-
-      // Create Supabase user (same project as Momentum-AI) and store refresh_token for session handoff after payment
-      if (isSupabaseConfigured()) {
-        try {
-          const supabaseCreate = await createSupabaseUser(storedData.email, storedData.password);
-          if ("error" in supabaseCreate && supabaseCreate.status !== 422) {
-            console.warn("Supabase user create failed (non-422):", supabaseCreate.error);
-          }
-          // Get session (works for new user or existing Supabase user)
-          const sessionResult = await getSupabaseSessionWithPassword(storedData.email, storedData.password);
-          if (!("error" in sessionResult)) {
-            await updateUser(user.id, { supabaseRefreshToken: sessionResult.refresh_token });
-          } else {
-            console.warn("Supabase session failed:", sessionResult.error);
-          }
-        } catch (err) {
-          console.error("Supabase sync during sign-up:", err);
-        }
-      }
-
-      // Clean up the verification code
-      verificationCodes.delete(email);
-
-      // Send welcome email
+  app.post(
+    "/api/verify-code-and-register",
+    async (req: Request, res: Response) => {
       try {
-        await sendWelcomeEmail(user.email, user.name);
-      } catch (emailError) {
-        console.error("Failed to send welcome email:", emailError);
-        // Don't fail the registration if email fails
-      }
+        const { email, code } = req.body;
 
-      const { password: _, ...userWithoutPassword } = user;
-
-      req.login(userWithoutPassword as Express.User, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Failed to log in after registration" });
+        if (!email || !code) {
+          return res
+            .status(400)
+            .json({ error: "Email and code are required" });
         }
-        res.status(201).json({ 
-          user: userWithoutPassword,
-          message: "Account created successfully!"
+
+        const storedData = verificationCodes.get(email);
+        if (!storedData) {
+          return res
+            .status(400)
+            .json({ error: "Verification code not found or expired" });
+        }
+        if (storedData.expiresAt < Date.now()) {
+          verificationCodes.delete(email);
+          return res
+            .status(400)
+            .json({ error: "Verification code has expired" });
+        }
+        if (storedData.code !== code) {
+          return res.status(400).json({ error: "Invalid verification code" });
+        }
+
+        // Create the user in Supabase (auth + profile)
+        const user = await createUser({
+          email: storedData.email,
+          password: storedData.password,
+          name: storedData.name,
+          emailVerified: true,
         });
-      });
-    } catch (error) {
-      console.error("Verify code error:", error);
-      res.status(500).json({ error: "Failed to verify code" });
+
+        // Capture refresh token for future momentum-launch handoff
+        getSupabaseSessionWithPassword(storedData.email, storedData.password)
+          .then((session) => {
+            if (!("error" in session)) {
+              updateUser(user.id, { supabaseRefreshToken: session.refresh_token }).catch(
+                (err) => console.error("Failed to store refresh token after register:", err)
+              );
+            }
+          })
+          .catch((err) => console.error("Supabase session after register:", err));
+
+        verificationCodes.delete(email);
+
+        try {
+          await sendWelcomeEmail(user.email, user.name);
+        } catch (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+        }
+
+        req.login(user as Express.User, (err) => {
+          if (err) {
+            return res
+              .status(500)
+              .json({ error: "Failed to log in after registration" });
+          }
+          res.status(201).json({ user, message: "Account created successfully!" });
+        });
+      } catch (error) {
+        console.error("Verify code error:", error);
+        res.status(500).json({ error: "Failed to verify code" });
+      }
     }
-  });
-
-  app.get("/api/verify-email", async (req: Request, res: Response) => {
-    try {
-      const { token } = req.query;
-      
-      if (!token || typeof token !== "string") {
-        return res.redirect("/login?error=invalid-token");
-      }
-
-      const user = await getUserByVerificationToken(token);
-      if (!user) {
-        return res.redirect("/login?error=invalid-token");
-      }
-
-      await updateUser(user.id, {
-        emailVerified: true,
-        verificationToken: null,
-      });
-
-      try {
-        await sendWelcomeEmail(user.email, user.name);
-      } catch (emailError) {
-        console.error("Failed to send welcome email:", emailError);
-      }
-
-      res.redirect("/login?verified=true");
-    } catch (error) {
-      console.error("Email verification error:", error);
-      res.redirect("/login?error=verification-failed");
-    }
-  });
+  );
 
   app.post("/api/forgot-password", async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-      
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
       }
 
       const user = await getUserByEmail(email);
       if (!user) {
-        return res.json({ message: "If an account exists, a reset email has been sent" });
+        return res.json({
+          message: "If an account exists, a reset email has been sent",
+        });
       }
 
       const resetToken = crypto.randomBytes(32).toString("hex");
       const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000);
 
-      await updateUser(user.id, {
-        resetToken,
-        resetTokenExpiry,
-      });
+      await updateUser(user.id, { resetToken, resetTokenExpiry });
 
       try {
         await sendPasswordResetEmail(email, resetToken, user.name);
@@ -325,48 +296,36 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // One-time code exchange for Momentum-AI: /auth/callback receives code, calls this to get tokens, then setSession
-  app.get("/api/auth/momentum-exchange", async (req: Request, res: Response) => {
-    try {
-      const code = typeof req.query.code === "string" ? req.query.code : null;
-      if (!code) {
-        return res.status(400).json({ error: "Missing code" });
-      }
-      const tokens = exchangeOneTimeCode(code);
-      if (!tokens) {
-        return res.status(404).json({ error: "Invalid or expired code" });
-      }
-      res.json({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
-    } catch (error) {
-      console.error("Momentum exchange error:", error);
-      res.status(500).json({ error: "Exchange failed" });
-    }
-  });
-
   app.post("/api/reset-password", async (req: Request, res: Response) => {
     try {
       const { token, password } = req.body;
-      
-      if (!token || !password) {
-        return res.status(400).json({ error: "Token and password are required" });
-      }
 
+      if (!token || !password) {
+        return res
+          .status(400)
+          .json({ error: "Token and password are required" });
+      }
       if (password.length < 8) {
-        return res.status(400).json({ error: "Password must be at least 8 characters" });
+        return res
+          .status(400)
+          .json({ error: "Password must be at least 8 characters" });
       }
 
       const user = await getUserByResetToken(token);
       if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
-        return res.status(400).json({ error: "Invalid or expired reset token" });
+        return res
+          .status(400)
+          .json({ error: "Invalid or expired reset token" });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // Update password in Supabase Auth
+      const updated = await updateSupabaseUserPassword(user.id, password);
+      if (!updated) {
+        return res.status(500).json({ error: "Failed to update password" });
+      }
 
-      await updateUser(user.id, {
-        password: hashedPassword,
-        resetToken: null,
-        resetTokenExpiry: null,
-      });
+      // Clear the reset token
+      await updateUser(user.id, { resetToken: null, resetTokenExpiry: null });
 
       res.json({ message: "Password reset successfully" });
     } catch (error) {
@@ -374,4 +333,29 @@ export function setupAuth(app: Express) {
       res.status(500).json({ error: "Failed to reset password" });
     }
   });
+
+  // One-time code exchange for Momentum-AI session handoff
+  app.get(
+    "/api/auth/momentum-exchange",
+    async (req: Request, res: Response) => {
+      try {
+        const code =
+          typeof req.query.code === "string" ? req.query.code : null;
+        if (!code) {
+          return res.status(400).json({ error: "Missing code" });
+        }
+        const tokens = exchangeOneTimeCode(code);
+        if (!tokens) {
+          return res.status(404).json({ error: "Invalid or expired code" });
+        }
+        res.json({
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+        });
+      } catch (error) {
+        console.error("Momentum exchange error:", error);
+        res.status(500).json({ error: "Exchange failed" });
+      }
+    }
+  );
 }

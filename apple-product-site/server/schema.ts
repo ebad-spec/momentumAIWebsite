@@ -1,23 +1,30 @@
-import { pgTable, serial, varchar, timestamp, boolean, text } from "drizzle-orm/pg-core";
+/**
+ * TypeScript types mirroring the Supabase schema.
+ * auth.users is the source of truth for identity; public.profiles holds
+ * profile + subscription data and is joined at the storage layer.
+ */
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  name: varchar("name", { length: 255 }).notNull(),
-  emailVerified: boolean("email_verified").default(false),
-  verificationToken: varchar("verification_token", { length: 255 }),
-  resetToken: varchar("reset_token", { length: 255 }),
-  resetTokenExpiry: timestamp("reset_token_expiry"),
-  createdAt: timestamp("created_at").defaultNow(),
-  subscriptionPlan: varchar("subscription_plan", { length: 50 }),
-  subscriptionStatus: varchar("subscription_status", { length: 50 }),
-  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
-  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
-  trialEndDate: timestamp("trial_end_date"),
-  subscriptionEndDate: timestamp("subscription_end_date"),
-  supabaseRefreshToken: text("supabase_refresh_token"),
-});
+export interface User {
+  id: string; // UUID from auth.users
+  email: string;
+  name: string;
+  emailVerified: boolean;
+  resetToken: string | null;
+  resetTokenExpiry: Date | null;
+  createdAt: Date | null;
+  subscriptionPlan: string | null;
+  subscriptionStatus: string | null;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  trialEndDate: Date | null;
+  subscriptionEndDate: Date | null;
+  supabaseRefreshToken: string | null;
+}
 
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
+export type InsertUser = {
+  email: string;
+  password: string;
+  name: string;
+  emailVerified?: boolean;
+  verificationToken?: string | null;
+};

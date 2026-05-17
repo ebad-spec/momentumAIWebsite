@@ -1,10 +1,7 @@
-import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "./schema";
 
-const pool = new Pool({
+// This pool is used only for the express-session store (connect-pg-simple).
+// All user/profile data lives in Supabase; see storage.ts.
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-
-export const db = drizzle(pool, { schema });
-export { pool };
