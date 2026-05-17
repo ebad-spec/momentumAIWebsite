@@ -6,14 +6,17 @@ type ArticleMeta = {
   imagePath: string;
 };
 
-function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
-  let el = document.querySelector(`meta[${attr}="${key}"]`);
-  if (!el) {
-    el = document.createElement('meta');
-    el.setAttribute(attr, key);
-    document.head.appendChild(el);
-  }
+function removeSocialMeta() {
+  document
+    .querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]')
+    .forEach((el) => el.remove());
+}
+
+function setMeta(attr: 'name' | 'property', key: string, content: string) {
+  const el = document.createElement('meta');
+  el.setAttribute(attr, key);
   el.setAttribute('content', content);
+  document.head.appendChild(el);
 }
 
 /** Updates document title + social meta in the browser (link previews use server-injected HTML). */
@@ -26,15 +29,19 @@ export function useArticleMeta(meta: ArticleMeta) {
     const prevTitle = document.title;
     document.title = meta.title;
 
-    upsertMeta('name', 'description', meta.description);
-    upsertMeta('property', 'og:title', meta.title);
-    upsertMeta('property', 'og:description', meta.description);
-    upsertMeta('property', 'og:url', url);
-    upsertMeta('property', 'og:image', image);
-    upsertMeta('name', 'twitter:card', 'summary_large_image');
-    upsertMeta('name', 'twitter:title', meta.title);
-    upsertMeta('name', 'twitter:description', meta.description);
-    upsertMeta('name', 'twitter:image', image);
+    removeSocialMeta();
+
+    setMeta('name', 'description', meta.description);
+    setMeta('property', 'og:type', 'article');
+    setMeta('property', 'og:site_name', 'Momentum Research');
+    setMeta('property', 'og:title', meta.title);
+    setMeta('property', 'og:description', meta.description);
+    setMeta('property', 'og:url', url);
+    setMeta('property', 'og:image', image);
+    setMeta('name', 'twitter:card', 'summary_large_image');
+    setMeta('name', 'twitter:title', meta.title);
+    setMeta('name', 'twitter:description', meta.description);
+    setMeta('name', 'twitter:image', image);
 
     return () => {
       document.title = prevTitle;

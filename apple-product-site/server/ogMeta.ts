@@ -67,6 +67,13 @@ const OG_PAGES: Record<string, OgPageConfig> = {
   },
 };
 
+/** Remove default site OG/Twitter tags so research pages don't stack logo + article images. */
+function stripDefaultSocialMeta(html: string): string {
+  return html
+    .replace(/<meta\s+property="og:[^"]*"[^>]*>\s*/gi, "")
+    .replace(/<meta\s+name="twitter:[^"]*"[^>]*>\s*/gi, "");
+}
+
 let cachedIndexHtml: string | null = null;
 
 function loadIndexHtml(buildDir: string): string {
@@ -89,6 +96,7 @@ export function sendOgAwareIndex(
 
   if (config) {
     const tags = buildOgHeadTags(config);
+    html = stripDefaultSocialMeta(html);
     html = html.replace(/<title>.*?<\/title>/i, "").replace(
       /<meta\s+name="description"[^>]*>/i,
       ""

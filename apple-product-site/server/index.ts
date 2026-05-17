@@ -37,6 +37,13 @@ app.use('/deck', express.static(deckPublicPath));
 
 const buildDir = path.join(__dirname, "../build");
 
+app.use((req, res, next) => {
+  if (/^\/favicon(\.ico|\.svg)?(\?|$)|^\/favicon_io\//.test(req.path)) {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  }
+  next();
+});
+
 app.use(express.static(buildDir));
 
 app.get(["/research", "/research/mindtrace"], (req, res) => {
