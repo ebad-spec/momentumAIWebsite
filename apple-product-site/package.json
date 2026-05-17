@@ -25,6 +25,7 @@
     "@types/react-router-dom": "^5.3.3",
     "bcrypt": "^6.0.0",
     "canvas": "^2.11.2",
+    "chart.js": "^4.4.1",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

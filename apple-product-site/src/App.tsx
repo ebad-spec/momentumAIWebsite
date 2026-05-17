@@ -7,6 +7,8 @@ import EventsPage from './components/EventsPage';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import TeamPage from './components/TeamPage';
+import ResearchIndexPage from './pages/ResearchIndexPage';
+import MindTraceArticle from './pages/MindTraceArticle';
 import PaywallModal from './components/PaywallModal';
 import PaymentSuccess from './components/PaymentSuccess';
 import SubscriptionSettingsModal from './components/SubscriptionSettingsModal';
@@ -816,6 +818,7 @@ function HomePage() {
 function Navigation() {
   const location = useLocation();
   const isTeamPage = location.pathname === '/team';
+  const isResearchPage = location.pathname.startsWith('/research');
   const isDarkPage = location.pathname === '/team'; // Only team page uses dark styling
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -974,13 +977,15 @@ function Navigation() {
               }`}>
                 Careers
               </Link>
-              <a href="/deck" className={`transition-colors text-xs font-medium ${
+              <Link to="/research" className={`transition-colors text-xs font-medium ${
                 isDarkPage 
                   ? 'text-gray-300 hover:text-red-400' 
-                  : 'text-gray-600 hover:text-red-500'
+                  : isResearchPage
+                    ? 'text-red-500'
+                    : 'text-gray-600 hover:text-red-500'
               }`}>
-                Deck
-              </a>
+                Research Index
+              </Link>
             </div>
             
             {/* Desktop Auth Buttons */}
@@ -1245,8 +1250,8 @@ function Navigation() {
             >
               Careers
             </Link>
-            <a 
-              href="/deck" 
+            <Link 
+              to="/research" 
               onClick={closeMobileMenu}
               className={`block py-3 px-3 text-sm font-medium transition-colors rounded-lg ${
                 isDarkPage 
@@ -1254,8 +1259,8 @@ function Navigation() {
                   : 'text-gray-700 hover:bg-gray-50 hover:text-red-500'
               }`}
             >
-              Deck
-            </a>
+              Research Index
+            </Link>
 
             {/* Divider */}
             <div className="h-px bg-gray-200/20 my-4"></div>
@@ -1460,6 +1465,8 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/success" element={<PaymentSuccess />} />
+        <Route path="/research" element={<ResearchIndexPage />} />
+        <Route path="/research/mindtrace" element={<MindTraceArticle />} />
       </Routes>
     </div>
   );

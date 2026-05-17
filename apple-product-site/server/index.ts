@@ -4,6 +4,7 @@ import cors from "cors";
 import path from "path";
 import { setupAuth } from "./auth";
 import { setupStripe } from "./stripe";
+import { sendOgAwareIndex } from "./ogMeta";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "5000", 10);
@@ -34,10 +35,16 @@ app.get('/deck/', (req, res) => {
 
 app.use('/deck', express.static(deckPublicPath));
 
-app.use(express.static(path.join(__dirname, "../build")));
+const buildDir = path.join(__dirname, "../build");
+
+app.use(express.static(buildDir));
+
+app.get(["/research", "/research/mindtrace"], (req, res) => {
+  sendOgAwareIndex(res, buildDir, req.path);
+});
 
 app.get(/^(?!\/api).*$/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../build", "index.html"));
+  sendOgAwareIndex(res, buildDir, req.path);
 });
 
 app.listen(PORT, "0.0.0.0", () => {

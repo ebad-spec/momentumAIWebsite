@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+
+.research-page {
+  --research-bg: #faf9f7;
+  --research-ink: #0a0a0a;
+  --research-muted: #5c5c5c;
+  --research-border: #e8e6e1;
+  --research-accent: #ff0040;
+  --research-card: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--research-ink);
+  background: var(--research-bg);
+  min-height: 100vh;
+}
+
+.research-serif {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+}
+
+.research-index-hero {
+  padding: 7rem 1.5rem 3rem;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.research-article-wrap {
+  padding: 6.5rem 1.5rem 5rem;
+}
+
+.research-article-inner {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.research-article-wide {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.research-chip {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--research-muted);
+  border: 1px solid var(--research-border);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.research-card-link {
+  display: block;
+  background: var(--research-card);
+  border: 1px solid var(--research-border);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.research-card-link:hover {
+  border-color: #d4d1c9;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+}
+
+.research-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2.5rem 0;
+}
+
+@media (max-width: 640px) {
+  .research-stat-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.research-stat-box {
+  background: var(--research-card);
+  border: 1px solid var(--research-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.research-stat-box .value {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.research-stat-box .label {
+  font-size: 0.75rem;
+  color: var(--research-muted);
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+.research-chart-block {
+  background: var(--research-card);
+  border: 1px solid var(--research-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.research-chart-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--research-muted);
+  letter-spacing: 0.02em;
+}
+
+.research-pullquote {
+  border-left: 3px solid var(--research-accent);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  margin: 2rem 0;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.research-prose p {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: #1a1a1a;
+  margin-bottom: 1.25rem;
+}
+
+.research-prose h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin: 2.75rem 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.research-prose h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--research-muted);
+  margin: 2rem 0 0.75rem;
+}
+
+.research-methodology {
+  font-size: 0.8125rem;
+  color: var(--research-muted);
+  line-height: 1.6;
+  border-top: 1px solid var(--research-border);
+  padding-top: 2rem;
+  margin-top: 3rem;
+}
+
+.research-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin: 1rem 0;
+}
+
+.research-table th,
+.research-table td {
+  border-bottom: 1px solid var(--research-border);
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+}
+
+.research-table th {
+  font-weight: 600;
+  color: var(--research-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.research-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--research-muted);
+  text-decoration: none;
+  margin-bottom: 2rem;
+}
+
+.research-back:hover {
+  color: var(--research-ink);
+}
